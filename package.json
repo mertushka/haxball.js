@@ -1,0 +1,39 @@
+{
+    "name": "haxball.js",
+    "version": "1.0.1",
+    "description": "A powerful library for interacting with the Haxball Headless API",
+    "main": "src/index.js",
+    "scripts": {
+        "test": "echo 'who needs test when you can code' && exit 0",
+        "lint": "npx eslint src test",
+        "lint:fix": "npm run lint -- --fix",
+        "prettier": "npx prettier src test --check",
+        "prettier:fix": "npm run prettier -- --write",
+        "format": "npm run prettier:fix && npm run lint:fix"
+    },
+    "keywords": [
+        "haxball",
+        "bot",
+        "room"
+    ],
+    "author": "mertushka",
+    "license": "MIT",
+    "dependencies": {
+        "@discordjs/collection": "^0.2.0",
+        "puppeteer": "^10.1.0"
+    },
+    "devDependencies": {
+        "eslint": "^7.31.0",
+        "eslint-config-prettier": "^8.3.0",
+        "prettier": "2.3.2",
+        "prettier-eslint": "^12.0.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mertushka/haxball.js.git"
+    },
+    "bugs": {
+        "url": "https://github.com/mertushka/haxball.js/issues"
+    },
+    "homepage": "https://github.com/mertushka/haxball.js#readme"
+}
