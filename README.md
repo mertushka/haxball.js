@@ -43,7 +43,7 @@ const room = new HaxballJS.Room({
 });
 
 room.once("ready", (link) => {
-    console.log(`Room created ${link}!`);
+    console.log(`Room created ${link}`);
 });
 
 room.on("onPlayerChat", (message) => {

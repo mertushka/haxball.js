@@ -1,5 +1,6 @@
-'use strict'
+"use strict";
 
 module.exports = {
-    Room: require('./structures/Room')
-}
+    Room: require("./structures/Room"),
+    Collection: require("./structures/Collection")
+};
