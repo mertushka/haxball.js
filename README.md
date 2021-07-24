@@ -46,7 +46,7 @@ room.once("ready", (link) => {
     console.log(`Room created ${link}`);
 });
 
-room.on("onPlayerChat", (message) => {
+room.on("onPlayerChat", (player, message) => {
     if (message === "ping") {
         room.send("pong");
     }
