@@ -2,6 +2,12 @@ class Player {
     constructor(client, player) {
         this.client = client;
         this.player = player;
+
+        this._patch(player);
+    }
+
+    _patch(player) {
+        this.player = player;
     }
 
     get id() {

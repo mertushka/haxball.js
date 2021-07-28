@@ -19,7 +19,11 @@ class Room extends EventEmitter {
     }
 
     _patch(player) {
-        this.players.cache.set(player.id, new Player(this, player));
+        if (this.players.cache.has(player.id)) {
+            this.players.cache.get(player.id)._patch(player);
+        } else {
+            this.players.cache.set(player.id, new Player(this, player));
+        }
         return this.players.cache.get(player.id);
     }
 
@@ -56,9 +60,8 @@ class Room extends EventEmitter {
                         this.room.exposeFunction("emit", (event, ...message) => {
                             for (let index = 0; index < message.length; index++) {
                                 if (message[index].hasOwnProperty("admin")) {
-                                    if (message[index].id === 0) return;
                                     message[index] = this._patch(message[index]);
-                                    if (event == "onPlayerLeft") this.players.cache.delete(message[index].id);
+                                    if (event == "onPlayerLeave") this.players.cache.delete(message[index].id);
                                 }
                             }
 
