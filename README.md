@@ -122,7 +122,7 @@ room.create();
 🤓 **Mertushka <mertushkaonline@gmail.com>**
 
 -   Instagram: [@mertushka](https://instagram.com/mertushka)
--   Github: [@mertushka](https://github.com/mertushka)
+-   Discord: [mert#0006](https://discord.com/users/745038831472083065)
 
 [Back To The Top](#title)
 

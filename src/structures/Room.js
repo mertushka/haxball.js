@@ -3,7 +3,18 @@ const puppeteer = require("puppeteer");
 const Player = require("./Player");
 const { Collection } = require("@discordjs/collection");
 
+/**
+ *
+ *
+ * @class Room
+ * @extends {EventEmitter}
+ */
 class Room extends EventEmitter {
+    /**
+     * Creates an instance of Room.
+     * @param {*} config
+     * @memberof Room
+     */
     constructor(config) {
         super();
 
@@ -27,6 +38,11 @@ class Room extends EventEmitter {
         return this.players.cache.get(player.id);
     }
 
+    /**
+     *
+     *
+     * @memberof Room
+     */
     create() {
         if (this.room !== null) throw new Error("You already created a room!");
 
@@ -74,14 +90,27 @@ class Room extends EventEmitter {
             .catch((error) => this.emit("error", `Error while creating browser: ${error}`));
     }
 
+    /**
+     *
+     *
+     * @param {*} message
+     * @return {*}
+     * @memberof Room
+     */
     send(message) {
         return new Promise((resolve, reject) => {
-            const promise = this.room.evaluate(`(() => { return room.sendChat("${message}")})()`);
+            const promise = this.room.evaluate(`(() => { return room.sendChat(\`${message}\`)})()`);
 
             promise.then((p) => resolve(p)).catch((error) => reject(new Error(error)));
         });
     }
 
+    /**
+     *
+     *
+     * @return {*}
+     * @memberof Room
+     */
     clearBans() {
         return new Promise((resolve, reject) => {
             const promise = this.room.evaluate("(() => { return room.clearBans()})()");
@@ -90,6 +119,13 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @param {*} limit
+     * @return {*}
+     * @memberof Room
+     */
     setScoreLimit(limit) {
         return new Promise((resolve, reject) => {
             if (isNaN(limit)) reject(new TypeError("Value must be integer."));
@@ -100,6 +136,13 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @param {*} limit
+     * @return {*}
+     * @memberof Room
+     */
     setTimeLimit(limit) {
         return new Promise((resolve, reject) => {
             if (isNaN(limit)) reject(new TypeError("Value must be integer."));
@@ -110,22 +153,43 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @param {*} stadiumFileContents
+     * @return {*}
+     * @memberof Room
+     */
     setCustomStadium(stadiumFileContents) {
         return new Promise((resolve, reject) => {
-            const promise = this.room.evaluate(`(() => { return room.setCustomStadium("${stadiumFileContents}")})()`);
+            const promise = this.room.evaluate(`(() => { return room.setCustomStadium(\`${stadiumFileContents}\`)})()`);
 
             promise.then((p) => resolve(p)).catch((error) => reject(new Error(error)));
         });
     }
 
+    /**
+     *
+     *
+     * @param {*} stadiumName
+     * @return {*}
+     * @memberof Room
+     */
     setDefaultStadium(stadiumName) {
         return new Promise((resolve, reject) => {
-            const promise = this.room.evaluate(`(() => { return room.setDefaultStadium("${stadiumName}")})()`);
+            const promise = this.room.evaluate(`(() => { return room.setDefaultStadium(\`${stadiumName}\`)})()`);
 
             promise.then((p) => resolve(p)).catch((error) => reject(new Error(error)));
         });
     }
 
+    /**
+     *
+     *
+     * @param {*} locked
+     * @return {*}
+     * @memberof Room
+     */
     setTeamsLock(locked) {
         return new Promise((resolve, reject) => {
             if (!locked) reject(new TypeError("Value must be Boolean."));
@@ -136,6 +200,16 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @param {*} team
+     * @param {*} angle
+     * @param {*} textColor
+     * @param {*} colors
+     * @return {*}
+     * @memberof Room
+     */
     setTeamColors(team, angle, textColor, colors) {
         return new Promise((resolve, reject) => {
             if (isNaN(team) || isNaN(angle) || isNaN(textColor) || isNaN(colors)) reject(new TypeError("Values must be Integer."));
@@ -146,6 +220,12 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @return {*}
+     * @memberof Room
+     */
     startGame() {
         return new Promise((resolve, reject) => {
             const promise = this.room.evaluate("(() => { return room.startGame()})()");
@@ -154,6 +234,12 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @return {*}
+     * @memberof Room
+     */
     stopGame() {
         return new Promise((resolve, reject) => {
             const promise = this.room.evaluate("(() => { return room.stopGame()})()");
@@ -162,6 +248,12 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @return {*}
+     * @memberof Room
+     */
     pauseGame() {
         return new Promise((resolve, reject) => {
             const promise = this.room.evaluate("(() => { return room.pauseGame()})()");
@@ -170,6 +262,13 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @param {*} playerID
+     * @return {*}
+     * @memberof Room
+     */
     getPlayer(playerID) {
         return new Promise((resolve, reject) => {
             const promise = this.room.evaluate(`(() => { return room.getPlayer(${playerID})})()`);
@@ -178,6 +277,12 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @return {*}
+     * @memberof Room
+     */
     getPlayerList() {
         return new Promise((resolve, reject) => {
             const promise = this.room.evaluate("(() => { return room.getPlayerList()})()");
@@ -186,6 +291,12 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @return {*}
+     * @memberof Room
+     */
     getScores() {
         return new Promise((resolve, reject) => {
             const promise = this.room.evaluate("(() => { return room.getScores()})()");
@@ -194,6 +305,12 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @return {*}
+     * @memberof Room
+     */
     getBallPosition() {
         return new Promise((resolve, reject) => {
             const promise = this.room.evaluate("(() => { return room.getBallPosition()})()");
@@ -202,6 +319,12 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @return {*}
+     * @memberof Room
+     */
     startRecording() {
         return new Promise((resolve, reject) => {
             const promise = this.room.evaluate("(() => { return room.startRecording()})()");
@@ -210,6 +333,12 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @return {*}
+     * @memberof Room
+     */
     stopRecording() {
         return new Promise((resolve, reject) => {
             const promise = this.room.evaluate("(() => { return room.stopRecording()})()");
@@ -218,14 +347,28 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @param {*} pass
+     * @return {*}
+     * @memberof Room
+     */
     setPassword(pass) {
         return new Promise((resolve, reject) => {
-            const promise = this.room.evaluate(`(() => { return room.setPassword("${pass}")})()`);
+            const promise = this.room.evaluate(`(() => { return room.setPassword(\`${pass}\`)})()`);
 
             promise.then((p) => resolve(p)).catch((error) => reject(new Error(error)));
         });
     }
 
+    /**
+     *
+     *
+     * @param {*} required
+     * @return {*}
+     * @memberof Room
+     */
     setRequireRecaptcha(required) {
         return new Promise((resolve, reject) => {
             if (!required) reject(new TypeError("Value must be Boolean."));
@@ -236,6 +379,14 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @param {*} playerIdList
+     * @param {*} moveToTop
+     * @return {*}
+     * @memberof Room
+     */
     reorderPlayers(playerIdList, moveToTop) {
         return new Promise((resolve, reject) => {
             if (!Array.isArray(playerIdList) || !moveToTop) reject(new TypeError("Values must be Array and Boolean."));
@@ -246,16 +397,36 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @param {*} msg
+     * @param {*} targetId
+     * @param {*} color
+     * @param {*} style
+     * @param {*} sound
+     * @return {*}
+     * @memberof Room
+     */
     sendAnnouncement(msg, targetId, color, style, sound) {
         return new Promise((resolve, reject) => {
             if (msg === null) reject(new TypeError("Message can't be null."));
 
-            const promise = this.room.evaluate(`(() => { return room.sendAnnouncement("${msg}", ${targetId || null}, ${color || null}, ${style || null}, ${sound || null})})()`);
+            const promise = this.room.evaluate(`(() => { return room.sendAnnouncement(\`${msg}\`, ${targetId || null}, ${color || null}, ${style || null}, ${sound || null})})()`);
 
             promise.then((p) => resolve(p)).catch((error) => reject(new Error(error)));
         });
     }
 
+    /**
+     *
+     *
+     * @param {*} min
+     * @param {*} rate
+     * @param {*} burst
+     * @return {*}
+     * @memberof Room
+     */
     setKickRateLimit(min, rate, burst) {
         return new Promise((resolve, reject) => {
             if (isNaN(min) || isNaN(rate) || isNaN(burst)) reject(new TypeError("Values must be Integer."));
@@ -266,6 +437,14 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @param {*} discIndex
+     * @param {*} properties
+     * @return {*}
+     * @memberof Room
+     */
     setDiscProperties(discIndex, properties) {
         return new Promise((resolve, reject) => {
             if (isNaN(discIndex) || !properties.hasOwnProperty("x") || !properties.hasOwnProperty("y")) reject(new TypeError("Values must be Integer and Object."));
@@ -276,6 +455,13 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @param {*} discIndex
+     * @return {*}
+     * @memberof Room
+     */
     getDiscProperties(discIndex) {
         return new Promise((resolve, reject) => {
             if (isNaN(discIndex)) reject(new TypeError("Value must be Integer."));
@@ -286,6 +472,12 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @return {*}
+     * @memberof Room
+     */
     getDiscCount() {
         return new Promise((resolve, reject) => {
             const promise = this.room.evaluate("(() => { return room.getDiscCount()})()");
@@ -294,6 +486,12 @@ class Room extends EventEmitter {
         });
     }
 
+    /**
+     *
+     *
+     * @readonly
+     * @memberof Room
+     */
     get CollisionFlags() {
         return new Promise((resolve, reject) => {
             const promise = this.room.evaluate("(() => { return room.CollisionFlags})()");
