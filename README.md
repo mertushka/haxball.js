@@ -10,14 +10,14 @@
 
 ### 🔖 Table Of Contents
 
--   🤔 [How To Use](#how-to-use)
--   🚀 [Technologies](#technologies)
--   🌱 [Minimal Requirements](#minimal-requirements)
--   🎊 [Features](#features)
--   💡 [How To Contribute](#how-to-contribute)
--   🤗 [Contributors](#contributors)
--   👤 [Author](#author)
--   🔏 [License](#license)
+- 🤔 [How To Use](#how-to-use)
+- 🚀 [Technologies](#technologies)
+- 🌱 [Minimal Requirements](#minimal-requirements)
+- 🎊 [Features](#features)
+- 💡 [How To Contribute](#how-to-contribute)
+- 🤗 [Contributors](#contributors)
+- 👤 [Author](#author)
+- 🔏 [License](#license)
 
 ---
 
@@ -34,32 +34,36 @@ npm install haxball.js
 ```js
 const HaxballJS = require("haxball.js");
 
-const room = new HaxballJS.Room({
-    roomName: "Room Name",
-    playerName: "Haxball.JS",
+HaxballJS.then((HBInit) => {
+  // All is same as Haxball Headless Host Documentation
+  const room = HBInit({
+    roomName: "Haxball.JS",
     maxPlayers: 16,
     public: true,
-    token: "token"
-});
+    noPlayer: true,
+    token: "TOKEN", // Required
+  });
 
-room.once("ready", (link) => {
-    console.log(`Room created ${link}`);
-});
+  room.setDefaultStadium("Big");
+  room.setScoreLimit(5);
+  room.setTimeLimit(0);
 
-room.on("onPlayerChat", (player, message) => {
-    if (message === "ping") {
-        room.send("pong");
-    }
+  room.onRoomLink = function (link) {
+    console.log(link);
+  };
 });
-
-room.create();
 ```
 
 ---
 
 <h2 id="technologies">🚀 Technologies</h2>
 
--   Puppeteer
+- wrtc - WebRTC implementation for NodeJS
+- ws - Websocket Connection
+- JSON5 - JSON Helper Module
+- @peculiar/webcrypto - Webcrypto implementation for NodeJS
+- pako - ZLIP Port for NodeJS
+- node-fetch - HTTP Requests
 
 [Back To The Top](#title)
 
@@ -67,8 +71,8 @@ room.create();
 
 <h2 id="minimal-requirements">🌱 Minimal Requirements</h2>
 
--   NPM
--   NodeJs
+- NPM
+- NodeJs
 
 [Back To The Top](#title)
 
@@ -76,9 +80,9 @@ room.create();
 
 <h2 id="features">🎊 Features</h2>
 
--   [x] Promise based
--   [x] Synchronous
--   [x] Performant
+- [x] Promise based
+- [x] Synchronous
+- [x] Performant
 
 [Back To The Top](#title)
 
@@ -86,13 +90,13 @@ room.create();
 
 <h2 id="how-to-contribute">💡 How To Contribute</h2>
 
--   Make a fork of this repository
--   Clone to you machine and entry on respective paste
--   Create a branch with your resource: `git checkout -b my-feature`
--   Commit your changes: `git commit -m 'feat: My new feature'`
--   Push your branch: `git push origin my-feature`
--   A green button will appear at the beginning of this repository
--   Click to open and fill in the pull request information
+- Make a fork of this repository
+- Clone to you machine and entry on respective paste
+- Create a branch with your resource: `git checkout -b my-feature`
+- Commit your changes: `git commit -m 'feat: My new feature'`
+- Push your branch: `git push origin my-feature`
+- A green button will appear at the beginning of this repository
+- Click to open and fill in the pull request information
 
 <p align="center">
 <i>Contributions, issues and features requests are welcome!</i><br />
@@ -112,17 +116,6 @@ room.create();
 <a href="https://github.com/mertushka"><img width="60" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/>
 
 </p>
-
-[Back To The Top](#title)
-
----
-
-<h2 id="author">👤 Author</h2>
-
-🤓 **Mertushka <mertushkaonline@gmail.com>**
-
--   Instagram: [@mertushka](https://instagram.com/mertushka)
--   Discord: [mert#0006](https://discord.com/users/745038831472083065)
 
 [Back To The Top](#title)
 
