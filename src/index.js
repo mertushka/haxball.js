@@ -239,7 +239,7 @@ const headless = new Promise((resolve) => {
       this.ze = a;
       this.Df = b;
       this.sb = a;
-      this.Jc = global.performance.now();
+      this.Jc = performance.now();
     }
     function Da() {}
     function Ia() {}
@@ -275,7 +275,7 @@ const headless = new Promise((resolve) => {
       this.di = a.version;
       this.jh = 1;
       this.Pe = 0;
-      this.yf = global.performance.now();
+      this.yf = performance.now();
       this.Va = new fa(this.ih, a.iceServers, Ta.ii, a.ti);
       this.Va.Be = Ua(this, this.Jg);
       this.Va.Xe = function (a) {
@@ -364,7 +364,7 @@ const headless = new Promise((resolve) => {
       this.hb = a.hb;
       this.Ob = a.Ob;
       this.fb = a.fb;
-      this.Bf = global.performance.now();
+      this.Bf = performance.now();
       var c = null,
         c = function () {
           var a = b.Dh - b.Xh();
@@ -382,8 +382,7 @@ const headless = new Promise((resolve) => {
         var e = d[a];
         ++a;
         e.onmessage = function (a) {
-          b.Ec &&
-            ((b.Bf = global.performance.now()), null != b.$e && b.$e(a.data));
+          b.Ec && ((b.Bf = performance.now()), null != b.$e && b.$e(a.data));
         };
         e.onclose = function () {
           b.bb();
@@ -962,7 +961,7 @@ const headless = new Promise((resolve) => {
     Na.b = !0;
     Na.prototype = {
       Xh: function () {
-        return global.performance.now() - this.Bf;
+        return performance.now() - this.Bf;
       },
       mb: function (a, b) {
         if (this.Ec) {
@@ -1646,8 +1645,7 @@ const headless = new Promise((resolve) => {
         }
       },
       Ba: function () {
-        var a =
-          (((global.performance.now() - this.yf) * this.re) | 0) - this.ea;
+        var a = (((performance.now() - this.yf) * this.re) | 0) - this.ea;
         0 < a && this.dg(a);
         7 <= this.ea - this.Qe && this.Od();
         this.ea - this.Pe >= this.mg && (this.Od(), this.Jh());
@@ -1809,7 +1807,7 @@ const headless = new Promise((resolve) => {
         b.Tc = a.lb();
         var d = r.ba();
         d.f(4);
-        d.g((global.performance.now() - this.yf) * this.re + this.pf);
+        d.g((performance.now() - this.yf) * this.re + this.pf);
         d.g(c);
         b.mb(d, 2);
       },
@@ -1919,7 +1917,7 @@ const headless = new Promise((resolve) => {
         return a <= this.sb ? ((this.sb -= a), !0) : !1;
       },
       Ba: function () {
-        var a = global.performance.now(),
+        var a = performance.now(),
           b = Math.floor((a - this.Jc) / this.Df);
         this.Jc += b * this.Df;
         this.sb += b;
