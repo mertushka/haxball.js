@@ -4,6 +4,7 @@ const WebSocket = require("ws");
 const JSON5 = require("json5");
 const pako = require("pako");
 const { Crypto } = require("@peculiar/webcrypto");
+const { performance } = require("perf_hooks");
 const crypto = new Crypto();
 const headless = new Promise((resolve) => {
   (function (cb) {
