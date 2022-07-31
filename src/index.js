@@ -1,4 +1,4 @@
-const wrtc = require("wrtc");
+const wrtc = require("@koush/wrtc");
 const fetch = require("node-fetch");
 const WebSocket = require("ws");
 const JSON5 = require("json5");

@@ -10,7 +10,7 @@ describe("HBInit Tests", function () {
           maxPlayers: 16,
           public: true,
           noPlayer: true,
-          token: "thr1.AAAAAGJVxGsy3lwLOjNVRg.Qx-FC-EH8ZA", // Make sure update here before testing
+          token: "thr1.AAAAAGLmYKJ3LdGsopf1Mw.BWMK36G23Ys", // Make sure update here before testing
         });
       } catch (error) {
         done(error);
