@@ -32,16 +32,18 @@ npm install haxball.js
 #### 💻 Module Usage Example
 
 ```js
+// room.js
+
 const HaxballJS = require("haxball.js");
 
 HaxballJS.then((HBInit) => {
-  // All is same as Haxball Headless Host Documentation
+  // Same as in Haxball Headless Host Documentation
   const room = HBInit({
     roomName: "Haxball.JS",
     maxPlayers: 16,
     public: true,
     noPlayer: true,
-    token: "TOKEN", // Required
+    token: "YOUR_TOKEN_HERE", // Required
   });
 
   room.setDefaultStadium("Big");
@@ -52,6 +54,61 @@ HaxballJS.then((HBInit) => {
     console.log(link);
   };
 });
+```
+
+#### 💻 (Optional) TypeScript
+From v2.1.0, the package has basic typings included. Typings are automatically imported alongside `haxball.js` package.
+
+Install TypeScript and ts-node in your project:
+```bash
+npm install typescript --save-dev
+npm install ts-node --save-dev
+```
+
+Name the file `room.ts` instead of `room.js` and use example room code from the previous section. 
+
+You may run the server with `ts-node room.ts` instead of `node room.js`.
+
+#### 💻 (Optional) Modularize Room Script
+You can build full room scripts as NPM packages, that export `roomBuilder` function. These functions can be easily imported by another packages (launchers, remote orchestrators, etc.).
+
+```ts
+// super-futsal-room/index.ts
+
+import { Headless } from "haxball.js"
+
+// Every user installing the package will have to
+// implement this interface in order to run it.
+interface RoomArgs {
+    token: string
+    timeLimit: number
+}
+
+const roomBuilder = (HBInit: Headless, args: RoomArgs) => {
+    let room = HBInit({
+        roomName: "Hello TypeScript!",
+        token: args.token
+    })
+
+    room.setTimeLimit(args.timeLimit)
+}
+
+export default roomBuilder;
+```
+
+```ts
+// room-launcher/index.ts
+
+// Local path as example, but may refer to installed npm package
+import roomBuilder from "../super-futsal-room";
+import HaxballJS from "haxball.js";
+
+HaxballJS.then((HBInit => roomBuilder(HBInit, {
+  // Interface for config arguments is provided by the room script author
+  // Not defining them results in TypeScript error
+  token: "YOUR_TOKEN_HERE",
+  timeLimit: 3
+})))
 ```
 
 ---
@@ -83,6 +140,7 @@ HaxballJS.then((HBInit) => {
 - [x] Promise based
 - [x] Synchronous
 - [x] Performant
+- [x] Strongly Typed
 
 [Back To The Top](#title)
 
@@ -114,6 +172,7 @@ HaxballJS.then((HBInit) => {
 <p>
 
 <a href="https://github.com/mertushka"><img width="60" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/>
+<a href="https://github.com/jakjus"><img width="60" src="https://avatars.githubusercontent.com/u/43467994?v=4"/>
 
 </p>
 
