@@ -1,8 +1,9 @@
 {
   "name": "haxball.js",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "description": "A powerful library for interacting with the Haxball Headless API",
   "main": "src/index.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "test": "mocha --recursive --exit"
   },
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@mapbox/node-pre-gyp": "^1.0.9",
+    "@types/haxball-headless-browser": "^0.1.0",
     "mocha": "^9.2.2"
   },
   "repository": {
