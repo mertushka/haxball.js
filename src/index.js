@@ -1,11 +1,24 @@
 const wrtc = require("@koush/wrtc");
 const fetch = require("node-fetch");
 const WebSocket = require("ws");
+const url = require("url");
+const HttpsProxyAgent = require("https-proxy-agent");
 const JSON5 = require("json5");
 const pako = require("pako");
 const { Crypto } = require("@peculiar/webcrypto");
 const { performance } = require("perf_hooks");
 const crypto = new Crypto();
+
+const proxy = process.env.PROXY
+let proxyAgent;
+if (proxy) {
+    if (!proxy.startsWith("http")) {
+        proxy = "http://"+proxy
+    }
+    console.log(`Using proxy: ${proxy}`)
+    proxyAgent = new HttpsProxyAgent(url.parse(proxy));
+}
+
 const headless = new Promise((resolve) => {
   (function (cb) {
     function Ra() {}
@@ -710,6 +723,7 @@ const headless = new Promise((resolve) => {
               "Sec-WebSocket-Extensions":
                 "permessage-deflate; client_max_window_bits",
             },
+            agent: proxyAgent
           });
           d.ta.binaryType = "arraybuffer";
 
@@ -717,9 +731,11 @@ const headless = new Promise((resolve) => {
             d.Og();
           });
           d.ta.on("close", (a) => {
+            process.env.VERBOSE && console.log(a)
             d.xd(4001 != a);
           });
           d.ta.on("error", (e) => {
+            process.env.VERBOSE && console.error(e)
             d.xd(!0);
           });
           d.ta.on("message", Ua(d, d.Ng));
