@@ -56,6 +56,14 @@ HaxballJS.then((HBInit) => {
 });
 ```
 
+#### 💻 (Optional) Proxy
+Haxball has a limit of 2 rooms per IP. Therefore, you can use proxy with `PROXY=<YOUR_PROXY_IP>`.
+
+Example:
+```bash
+PROXY=http://127.0.0.1:9001 node run.js
+```
+
 #### 💻 (Optional) TypeScript
 From v2.1.0, the package has basic typings included. Typings are automatically imported alongside `haxball.js` package.
 
@@ -67,7 +75,16 @@ npm install ts-node --save-dev
 
 Name the file `room.ts` instead of `room.js` and use example room code from the previous section. 
 
-You may run the server with `ts-node room.ts` instead of `node room.js`.
+You may run the server with `ts-node room.ts` instead of `node room.js`. To make it runnable with `npm start`, add the alias to `package.json`:
+```json
+// package.json
+
+//...
+  "scripts": {
+    "start": "ts-node run.ts"
+  }
+//...
+```
 
 #### 💻 (Optional) Modularize Room Script
 You can build full room scripts as NPM packages, that export `roomBuilder` function. These functions can be easily imported by another packages (launchers, remote orchestrators, etc.).
