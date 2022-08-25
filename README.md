@@ -57,7 +57,7 @@ HaxballJS.then((HBInit) => {
 ```
 
 #### 💻 (Optional) Proxy
-Haxball has a limit of 2 rooms per IP. Therefore, you can use proxy with adding `proxy:"<YOUR_PROXY_IP>" in your RoomConfig`.
+Haxball has a limit of 2 rooms per IP. Therefore, you can use proxy with adding `proxy:"<YOUR_PROXY_IP>"` in your RoomConfig.
 
 Example:
 ```js
