@@ -57,11 +57,14 @@ HaxballJS.then((HBInit) => {
 ```
 
 #### 💻 (Optional) Proxy
-Haxball has a limit of 2 rooms per IP. Therefore, you can use proxy with `PROXY=<YOUR_PROXY_IP>`.
+Haxball has a limit of 2 rooms per IP. Therefore, you can use proxy with adding `proxy:"<YOUR_PROXY_IP>" in your RoomConfig`.
 
 Example:
-```bash
-PROXY=http://127.0.0.1:9001 node room.js
+```js
+HBInit({
+    ...
+    proxy: "http://1.1.1.1:80",
+});
 ```
 
 #### 💻 (Optional) TypeScript
