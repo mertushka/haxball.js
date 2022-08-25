@@ -61,7 +61,7 @@ Haxball has a limit of 2 rooms per IP. Therefore, you can use proxy with `PROXY=
 
 Example:
 ```bash
-PROXY=http://127.0.0.1:9001 node run.js
+PROXY=http://127.0.0.1:9001 node room.js
 ```
 
 #### 💻 (Optional) TypeScript
