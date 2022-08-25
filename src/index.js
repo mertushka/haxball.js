@@ -9,15 +9,8 @@ const { Crypto } = require("@peculiar/webcrypto");
 const { performance } = require("perf_hooks");
 const crypto = new Crypto();
 
-const proxy = process.env.PROXY
-let proxyAgent;
-if (proxy) {
-    if (!proxy.startsWith("http")) {
-        proxy = "http://"+proxy
-    }
-    console.log(`Using proxy: ${proxy}`)
-    proxyAgent = new HttpsProxyAgent(url.parse(proxy));
-}
+var proxyAgent;
+var debug = false;
 
 const headless = new Promise((resolve) => {
   (function (cb) {
@@ -723,7 +716,7 @@ const headless = new Promise((resolve) => {
               "Sec-WebSocket-Extensions":
                 "permessage-deflate; client_max_window_bits",
             },
-            agent: proxyAgent
+            agent: proxyAgent,
           });
           d.ta.binaryType = "arraybuffer";
 
@@ -731,11 +724,10 @@ const headless = new Promise((resolve) => {
             d.Og();
           });
           d.ta.on("close", (a) => {
-            process.env.VERBOSE && console.log(a)
             d.xd(4001 != a);
           });
           d.ta.on("error", (e) => {
-            process.env.VERBOSE && console.error(e)
+            debug && console.log(e);
             d.xd(!0);
           });
           d.ta.on("message", Ua(d, d.Ng));
@@ -2078,6 +2070,12 @@ const headless = new Promise((resolve) => {
       }
       if (y.tf) throw new l("Can't init twice");
       y.tf = !0;
+
+      proxyAgent = m("proxy", null)
+        ? new HttpsProxyAgent(url.parse(m("proxy", null)))
+        : null;
+      debug = m("debug", null) == true;
+
       var q = !m("public", !1),
         g = h("roomName", "Headless Room"),
         eb = h("playerName", "Host"),
