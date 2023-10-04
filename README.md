@@ -202,7 +202,7 @@ HaxballJS.then((HBInit => roomBuilder(HBInit, {
 
 <h2 id="license">🔏 License</h2>
 
-Copyright © 2021 [Mertushka <mertushkaonline@gmail.com>](https://github.com/mertushka)
+Copyright © 2023 [Mertushka <mertushka@proton.me>](https://github.com/mertushka)
 
 This project is licensed by [MIT License](https://api.github.com/licenses/mit).
 
