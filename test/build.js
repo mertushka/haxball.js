@@ -1,6 +1,6 @@
-const HaxballJS = require("../src/index");
+const HaxballJS = require("../src/build");
 
-describe("HBInit Tests", function () {
+describe("Build Tests", function () {
   it("should create room", function (done) {
     this.timeout(5000);
     HaxballJS.then((HBInit) => {

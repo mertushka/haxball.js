@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "types": "types/index.d.ts",
   "scripts": {
-    "test": "mocha --recursive --exit"
+    "test": "mocha --recursive --exit",
+    "build": "node scripts/nodeify.js"
   },
   "keywords": [
     "haxball",
@@ -21,9 +22,9 @@
     "@types/haxball-headless-browser": "^0.1.0",
     "http-proxy-agent": "^5.0.0",
     "json5": "^2.2.1",
-    "node-fetch": "^2.6.6",
     "pako": "^2.0.4",
-    "ws": "^8.5.0"
+    "ws": "^8.5.0",
+    "xhr2": "^0.2.1"
   },
   "devDependencies": {
     "@mapbox/node-pre-gyp": "^1.0.9",
