@@ -89,48 +89,6 @@ You may run the server with `ts-node room.ts` instead of `node room.js`. To make
 //...
 ```
 
-#### 💻 (Optional) Modularize Room Script
-You can build full room scripts as NPM packages, that export `roomBuilder` function. These functions can be easily imported by another packages (launchers, remote orchestrators, etc.).
-
-```ts
-// super-futsal-room/index.ts
-
-import { Headless } from "haxball.js"
-
-// Every user installing the package will have to
-// implement this interface in order to run it.
-interface RoomArgs {
-    token: string
-    timeLimit: number
-}
-
-const roomBuilder = (HBInit: Headless, args: RoomArgs) => {
-    let room = HBInit({
-        roomName: "Hello TypeScript!",
-        token: args.token
-    })
-
-    room.setTimeLimit(args.timeLimit)
-}
-
-export default roomBuilder;
-```
-
-```ts
-// room-launcher/index.ts
-
-// Local path as example, but may refer to installed npm package
-import roomBuilder from "../super-futsal-room";
-import HaxballJS from "haxball.js";
-
-HaxballJS.then((HBInit => roomBuilder(HBInit, {
-  // Interface for config arguments is provided by the room script author
-  // Not defining them results in TypeScript error
-  token: "YOUR_TOKEN_HERE",
-  timeLimit: 3
-})))
-```
-
 ---
 
 <h2 id="technologies">🚀 Technologies</h2>
