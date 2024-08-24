@@ -40,7 +40,7 @@ fetch("https://www.haxball.com/cache_hash.json")
       throw new Error("No HBInit matches found!");
     }
 
-    // Fix Websocket (Regex)
+    // Fix Websocket & Add Proxy Support (Regex)
 
     const WebsocketRegex = /new WebSocket\([^)]+\);/; // Match the pattern "new WebSocket(f+"?token="+e);"
     const WebsocketMatch = source.match(WebsocketRegex)[0];
@@ -72,25 +72,38 @@ fetch("https://www.haxball.com/cache_hash.json")
       throw new Error("No Recaptcha matches found!");
     }
 
+    console.log(
+      "RoomConfigLookup function:" + source.match(/(\w+)\("noPlayer",/)[1]
+    );
+
     // Add proxy support & other things manually because too hard to string manipulate with minified code
     // Also these things are not included in Headless Host Source originally so you can create ur own build without these things
     /* 
 
-    RoomConfigLookup: This is a example name for mimic minified function. 
+    RoomConfigLookup: This is an example name for mimic minified function. 
     
-    Example getting minified function: source.match(/(\w+)\("noPlayer",/)[1] -> this regex gets minified function's name from code
+    Example getting minified function: 
+    source.match(/(\w+)\("noPlayer",/)[1] -> this regex gets minified function's name from code
     k("noPlayer", !1) -> in this example regex gets function's name as "k"
-    
+
+
+    Implemented code to add proxy support to the module:
+
     proxyAgent = RoomConfigLookup("proxy", null)
     ? new HttpsProxyAgent(url.parse(RoomConfigLookup("proxy", null)))
     : null;
     debug = RoomConfigLookup("debug", null) == true;
+
+
+    
+    Websocket On Error Debug -> debug && console.error(e);
+
+    I will implement these manually with the help of the regex, as you can check manually added codes by searching @mertushka on the code 
     
     */
-    // Websocket On Error Debug -> debug && console.error(e);
 
     // Modules
-    target.write(`const wrtc = require("@koush/wrtc");
+    target.write(`const wrtc = require("@roamhq/wrtc");
 const XMLHttpRequest = require('xhr2');
 const WebSocket = require("ws");
 const url = require("url");

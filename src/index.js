@@ -1,4 +1,4 @@
-const wrtc = require("@koush/wrtc");
+const wrtc = require("@roamhq/wrtc");
 const XMLHttpRequest = require("xhr2");
 const WebSocket = require("ws");
 const url = require("url");
@@ -206,6 +206,7 @@ const onHBLoaded = function (cb) {
       if (E.Gf) throw t.s("Can't init twice");
       E.Gf = !0;
 
+      // Manually added for proxy support by @mertushka
       proxyAgent = k("proxy", null)
         ? new HttpsProxyAgent(url.parse(k("proxy", null)))
         : null;
@@ -3510,7 +3511,9 @@ const onHBLoaded = function (cb) {
           d.Ed(4001 != g.code);
         };
         d.ua.onerror = function () {
+          // Manually added for proxy support by @mertushka
           debug && console.error(e);
+
           d.Ed(!0);
         };
         d.ua.onmessage = hb(d, d.dh);

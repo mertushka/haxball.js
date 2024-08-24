@@ -9,7 +9,8 @@ describe("Build Tests", function () {
         maxPlayers: 16,
         public: true,
         noPlayer: true,
-        token: "thr1.AAAAAGUy-rw8ZuRUTuKCXA.WY0OtWrSz24", // Make sure update here before testing
+        debug: true,
+        token: "thr1.AAAAAGbJ6DKbFCpW73t1YQ.AcXcCi-Ak-w", // Make sure update here before testing
       });
 
       room.onRoomLink = function () {
