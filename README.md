@@ -102,7 +102,7 @@ You may run the server with `ts-node room.ts` instead of `node room.js`. To make
 - ws - Websocket Connection
 - JSON5 - JSON Helper Module
 - @peculiar/webcrypto - Webcrypto implementation for NodeJS
-- pako - ZLIP Port for NodeJS
+- pako - ZLIB Port for NodeJS
 - node-fetch - HTTP Requests
 
 [Back To The Top](#title)
