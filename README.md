@@ -100,10 +100,12 @@ You may run the server with `ts-node room.ts` instead of `node room.js`. To make
 
 - wrtc - WebRTC implementation for NodeJS
 - ws - Websocket Connection
-- JSON5 - JSON Helper Module
+- json5 - JSON Helper Module
 - @peculiar/webcrypto - Webcrypto implementation for NodeJS
-- pako - ZLIB Port for NodeJS
-- node-fetch - HTTP Requests
+- pako - ZLIB port for NodeJS
+- xhr2 - W3C XMLHttpRequest implementation for NodeJS
+- http-proxy-agent - Websocket Proxy Support
+- @types/haxball-headless-browser - Type definitions
 
 [Back To The Top](#title)
 
