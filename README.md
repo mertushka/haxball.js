@@ -57,9 +57,11 @@ HaxballJS.then((HBInit) => {
 ```
 
 #### 💻 (Optional) Proxy
+
 Haxball has a limit of 2 rooms per IP. Therefore, you can use proxy with adding `proxy: "<YOUR_PROXY_IP>"` in your RoomConfig.
 
 Example:
+
 ```js
 HBInit({
     ...
@@ -68,17 +70,20 @@ HBInit({
 ```
 
 #### 💻 (Optional) TypeScript
+
 From v2.1.0, the package has basic typings included. Typings are automatically imported alongside `haxball.js` package.
 
 Install TypeScript and ts-node in your project:
+
 ```bash
 npm install typescript --save-dev
 npm install ts-node --save-dev
 ```
 
-Name the file `room.ts` instead of `room.js` and use example room code from the previous section. 
+Name the file `room.ts` instead of `room.js` and use example room code from the previous section.
 
 You may run the server with `ts-node room.ts` instead of `node room.js`. To make it runnable with `npm start`, add the alias to `package.json`:
+
 ```json
 // package.json
 
@@ -107,7 +112,7 @@ You may run the server with `ts-node room.ts` instead of `node room.js`. To make
 <h2 id="minimal-requirements">🌱 Minimal Requirements</h2>
 
 - NPM
-- NodeJs
+- NodeJS Version >=18
 
 [Back To The Top](#title)
 
