@@ -10,7 +10,7 @@ describe("Build Tests", function () {
         public: true,
         noPlayer: true,
         debug: true,
-        token: "thr1.AAAAAGbJ6DKbFCpW73t1YQ.AcXcCi-Ak-w", // Make sure update here before testing
+        token: "thr1.AAAAAGbp0aqlQeoPhvCYsw.2yj7dNyUYhE", // Make sure update here before testing
       });
 
       room.onRoomLink = function () {
