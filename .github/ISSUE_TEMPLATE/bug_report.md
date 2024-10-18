@@ -13,6 +13,7 @@ A clear and concise description of what the bug is.
 **To Reproduce**
 Steps to reproduce the behavior:
 1. `npm install haxball.js` '...'
+2. ...
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
