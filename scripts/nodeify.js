@@ -107,7 +107,7 @@ fetch("https://www.haxball.com/cache_hash.json")
 const XMLHttpRequest = require('xhr2');
 const WebSocket = require("ws");
 const url = require("url");
-const HttpsProxyAgent = require("https-proxy-agent");
+const { HttpsProxyAgent } = require("https-proxy-agent");
 const JSON5 = require("json5");
 const pako = require("pako");
 const { Crypto } = require("@peculiar/webcrypto");
