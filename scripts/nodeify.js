@@ -22,11 +22,6 @@ fetch("https://www.haxball.com/cache_hash.json")
     source = source.replaceAll('getElementById("roomlink")', "null");
     source = source.replaceAll('getElementById("recaptcha")', "null");
 
-    source = source.replaceAll(
-      '"undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:this',
-      "global"
-    );
-
     // Fix HBInit Callback (Regex)
     const HBInitRegex = /HBInit=.+?;/; // Match the pattern "HBInit=...;"
     const HBInitMatch = source.match(HBInitRegex)[0];
@@ -103,20 +98,15 @@ fetch("https://www.haxball.com/cache_hash.json")
     */
 
     // Modules
-    target.write(`const wrtc = require("@roamhq/wrtc");
-const XMLHttpRequest = require('xhr2');
-const WebSocket = require("ws");
-const url = require("url");
-const { HttpsProxyAgent } = require("https-proxy-agent");
+    target.write(`const WebSocket = require("ws");
+const XMLHttpRequest = require("xhr2");
 const JSON5 = require("json5");
+const url = require("url");
 const pako = require("pako");
+const { HttpsProxyAgent } = require("https-proxy-agent");
 const { Crypto } = require("@peculiar/webcrypto");
 const { performance } = require("perf_hooks");
-
-const {RTCPeerConnection,
-RTCIceCandidate,
-RTCSessionDescription} = wrtc
-
+const { RTCPeerConnection, RTCIceCandidate, RTCSessionDescription } = require("node-datachannel/polyfill");
 const crypto = new Crypto();
 
 var promiseResolve;
@@ -143,6 +133,6 @@ const onHBLoaded = function (cb) {
     // Export HBInit Promise
     target.write(`
 module.exports = HBLoaded;`);
-  });
 
-console.log("Done!");
+    console.log("Done!");
+  });

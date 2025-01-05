@@ -10,8 +10,8 @@ describe("HBInit Tests (Proxy)", function () {
         public: true,
         noPlayer: true,
         debug: true,
-        proxy: "http://1.1.1.1:2222", // Make sure update here before testing
-        token: "thr1.AAAAAGcN88rkrUuIOwnP3w.iHPzi6bc0Ns", // Make sure update here before testing
+        proxy: "http://1.1.1.1:2222", // Make sure update here before testing: http://ip:port
+        token: "thr1.AAAAAGd6n3RGOJJKWU7ysA.1bO4Vuys4CM", // Make sure update here before testing
       });
 
       room.onRoomLink = function () {
