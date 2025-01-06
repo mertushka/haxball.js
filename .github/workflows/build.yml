@@ -29,36 +29,36 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run nodeify script
-        id: nodeify # Set an ID to capture output from this step
+      - name: Run nodeify script and set HASH
+        id: nodeify
         run: |
-          if [[ $RUNNER_OS == "Windows" ]]; then
-            $HASH = node scripts/nodeify.js  # PowerShell-compatible syntax for Windows
-            echo "HASH=$HASH" | Out-File -FilePath $env:GITHUB_ENV -Append  # Set the hash as an environment variable for Windows
-          else
-            HASH=$(node scripts/nodeify.js)  # Bash-compatible syntax for Linux/macOS
-            echo "HASH=$HASH" >> $GITHUB_ENV  # Set the hash as an environment variable for Linux/macOS
-          fi
+          if ($env:RUNNER_OS -eq "Windows") {
+              $HASH = node scripts/nodeify.js
+              echo "HASH=$HASH" | Out-File -FilePath $env:GITHUB_ENV -Append
+          } else {
+              HASH=$(node scripts/nodeify.js)
+              echo "HASH=$HASH" >> $GITHUB_ENV
+          }
 
       - name: Run tests
         run: npm test
         continue-on-error: false
 
       - name: Rename build.js to index.js if tests pass
-        if: success() # This ensures the step runs only if the tests passed
+        if: success()
         run: |
-          if [ $RUNNER_OS = "Windows" ]; then
-            move src\build.js src\index.js  # Use move command for Windows
-          else
-            mv src/build.js src/index.js  # Use mv command for Linux/macOS
-          fi
+          if ($env:RUNNER_OS -eq "Windows") {
+            Move-Item src\build.js src\index.js
+          } else {
+            mv src/build.js src/index.js
+          }
           echo "Renamed src/build.js to src/index.js"
 
       - name: Commit changes if renaming was successful
-        if: success() # This ensures the step runs only if renaming was successful
+        if: success()
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add src/index.js
-          git commit -m "Rename build.js to index.js (Hash: ${{ env.HASH }})"  # Include the hash in commit message
+          git commit -m "Rename build.js to index.js (Hash: ${{ env.HASH }})"
           git push origin ${{ github.ref }}

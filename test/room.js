@@ -1,4 +1,7 @@
-const HaxballJS = require("../src/build");
+function requireUncached(module) {
+  delete require.cache[require.resolve(module)];
+  return require(module);
+}
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -11,7 +14,7 @@ describe("HBInit Tests", function () {
 
   it("should create room", function (done) {
     this.timeout(30000);
-    HaxballJS.then((HBInit) => {
+    requireUncached("../src/build").then((HBInit) => {
       var room = HBInit({
         roomName: "Haxball.JS",
         maxPlayers: 16,
@@ -29,7 +32,7 @@ describe("HBInit Tests", function () {
 
   it("should create room (proxy)", function (done) {
     this.timeout(30000);
-    HaxballJS.then((HBInit) => {
+    requireUncached("../src/build").then((HBInit) => {
       var room = HBInit({
         roomName: "Haxball.JS",
         maxPlayers: 16,
