@@ -10,7 +10,7 @@ describe("HBInit Tests", function () {
         public: true,
         noPlayer: true,
         debug: true,
-        token: "thr1.AAAAAGd6n3RGOJJKWU7ysA.1bO4Vuys4CM", // Make sure update here before testing
+        token: "thr1.AAAAAGd76PXhIn2FWsZH6g.si4rjSAnmF4", // Make sure update here before testing
       });
 
       room.onRoomLink = function () {
