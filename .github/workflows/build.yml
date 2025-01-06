@@ -42,7 +42,7 @@ jobs:
 
       - name: Run tests
         run: npm test
-        continue-on-error: true # Continue even if tests fail to rename the file
+        continue-on-error: false
 
       - name: Rename build.js to index.js if tests pass
         if: success() # This ensures the step runs only if the tests passed
