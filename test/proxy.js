@@ -1,4 +1,4 @@
-const HaxballJS = require("../src/index");
+const HaxballJS = require("../src/build");
 
 describe("HBInit Tests (Proxy)", function () {
   it("should create room", function (done) {

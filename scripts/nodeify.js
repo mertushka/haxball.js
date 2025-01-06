@@ -5,6 +5,8 @@ fetch("https://www.haxball.com/cache_hash.json")
   .then(async (data) => {
     const hash = data.replaceAll('"', "");
 
+    console.log("Hash:", hash);
+
     let source = await (
       await fetch(
         `https://www.haxball.com/${hash}/__cache_static__/g/headless-min.js`
@@ -135,4 +137,6 @@ const onHBLoaded = function (cb) {
 module.exports = HBLoaded;`);
 
     console.log("Done!");
+
+    return hash;
   });
