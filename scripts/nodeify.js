@@ -69,9 +69,9 @@ fetch("https://www.haxball.com/cache_hash.json")
       throw new Error("No Recaptcha matches found!");
     }
 
-    console.log(
+    /*console.log(
       "RoomConfigLookup function:" + source.match(/(\w+)\("noPlayer",/)[1]
-    );
+    );*/
 
     // Add proxy support & other things manually because too hard to string manipulate with minified code
     // Also these things are not included in Headless Host Source originally so you can create ur own build without these things
