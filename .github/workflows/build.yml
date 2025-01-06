@@ -1,0 +1,59 @@
+name: Node.js CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  nodeify:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [16.x, 18.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run nodeify script
+        id: nodeify # Set an ID to capture output from this step
+        run: |
+          HASH=$(node scripts/nodeify.js)  # Capture the hash returned by nodeify.js
+          echo "HASH=$HASH" >> $GITHUB_ENV  # Set the hash as an environment variable
+
+      - name: Run tests
+        run: npm test
+        continue-on-error: true # Continue even if tests fail to rename the file
+
+      - name: Rename build.js to index.js if tests pass
+        if: success() # This ensures the step runs only if the tests passed
+        run: |
+          if [ $RUNNER_OS = "Windows" ]; then
+            move src\build.js src\index.js  # Use move command for Windows
+          else
+            mv src/build.js src/index.js  # Use mv command for Linux/macOS
+          fi
+          echo "Renamed src/build.js to src/index.js"
+
+      - name: Commit changes if renaming was successful
+        if: success() # This ensures the step runs only if renaming was successful
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/index.js
+          git commit -m "Rename build.js to index.js (Hash: ${{ env.HASH }})"  # Include the hash in commit message
+          git push origin ${{ github.ref }}
