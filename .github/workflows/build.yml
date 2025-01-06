@@ -32,13 +32,13 @@ jobs:
       - name: Run nodeify script and set HASH
         id: nodeify
         run: |
-          if ($env:RUNNER_OS -eq "Windows") {
+          if [ "$RUNNER_OS" = "Windows" ]; then
               $HASH = node scripts/nodeify.js
               echo "HASH=$HASH" | Out-File -FilePath $env:GITHUB_ENV -Append
-          } else {
+          else
               HASH=$(node scripts/nodeify.js)
               echo "HASH=$HASH" >> $GITHUB_ENV
-          }
+          fi
 
       - name: Run tests
         run: npm test
@@ -47,11 +47,11 @@ jobs:
       - name: Rename build.js to index.js if tests pass
         if: success()
         run: |
-          if ($env:RUNNER_OS -eq "Windows") {
+          if [ "$RUNNER_OS" = "Windows" ]; then
             Move-Item src\build.js src\index.js
-          } else {
+          else
             mv src/build.js src/index.js
-          }
+          fi
           echo "Renamed src/build.js to src/index.js"
 
       - name: Commit changes if renaming was successful
