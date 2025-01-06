@@ -54,11 +54,21 @@ jobs:
           fi
           echo "Renamed src/build.js to src/index.js"
 
-      - name: Commit changes if renaming was successful
-        if: success()
+  commit:
+    runs-on: ubuntu-latest
+    needs: nodeify # This ensures the commit job only runs after all tests pass
+    if: success() # Only run if all previous jobs pass
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure Git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit changes if renaming was successful
+        run: |
           git add src/index.js
-          git commit -m "Rename build.js to index.js (Hash: ${{ env.HASH }})"
-          git push origin ${{ github.ref }}
+          git commit -m "Update (${{ env.HASH }})"  # Include the hash in commit message
+          git push origin ${{ github.ref }}  # Push changes to the remote repository
