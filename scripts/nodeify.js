@@ -136,7 +136,7 @@ const onHBLoaded = function (cb) {
     target.write(`
 module.exports = HBLoaded;`);
 
-    console.log("Done!");
+    //console.log("Done!");
 
     return hash;
   });
