@@ -32,8 +32,13 @@ jobs:
       - name: Run nodeify script
         id: nodeify # Set an ID to capture output from this step
         run: |
-          HASH=$(node scripts/nodeify.js)  # Capture the hash returned by nodeify.js
-          echo "HASH=$HASH" >> $GITHUB_ENV  # Set the hash as an environment variable
+          if [ $RUNNER_OS = "Windows" ]; then
+            $HASH = node scripts/nodeify.js  # Use PowerShell-compatible syntax for Windows
+            echo "HASH=$HASH" | Out-File -FilePath $env:GITHUB_ENV -Append  # Set the hash as an environment variable
+          else
+            HASH=$(node scripts/nodeify.js)  # Capture the hash returned by nodeify.js for Linux/macOS
+            echo "HASH=$HASH" >> $GITHUB_ENV  # Set the hash as an environment variable
+          fi
 
       - name: Run tests
         run: npm test
