@@ -1,22 +1,39 @@
-name: "🚀 release"
+name: 📦 NPM Release
 
 on:
-    release:
-        types: [published]
+  release:
+    types: [published]
 
 jobs:
-    release:
-        name: 🚀 release
-        runs-on: ubuntu-latest
-        steps:
-            - name: 📚 checkout
-              uses: actions/checkout@v2
-            - name: 🟢 node
-              uses: actions/setup-node@v2
-              with:
-                  node-version: 14
-                  registry-url: https://registry.npmjs.org
-            - name: 🚀 publish
-              run: npm publish --access public
-              env:
-                  NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
+  release:
+    name: 🚀 Publish to NPM
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📚 Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+          registry-url: https://registry.npmjs.org
+          cache: "npm"
+
+      - name: 📥 Install Dependencies
+        run: npm ci
+
+      - name: 🔨 Build Package
+        run: npm run build
+
+      - name: 🚀 Publish to NPM
+        run: |
+          echo "📦 Publishing version $(node -p "require('./package.json').version")"
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: ✨ Post-Release Info
+        run: |
+          echo "🎉 Successfully published to NPM!"
+          echo "📊 Package: $(node -p "require('./package.json').name")"
+          echo "📌 Version: $(node -p "require('./package.json').version")"

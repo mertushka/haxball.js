@@ -6,13 +6,13 @@ function requireUncached(module) {
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const TOKEN = "thr1.AAAAAGd82uXE_qA2Ongrnw.6AWO8_UYHKA"; // Make sure update here before testing
-const PROXY = "http://1.1.1.1:2222"; // Make sure update here before testing: http://ip:port
+const PROXY = "http://1.1.1.1:2222"; // (Optional) http://ip:port
 
 describe("HBInit Tests", function () {
   this.timeout(10000);
 
   beforeEach(async function () {
-    await delay(2000); // Add a 2-second delay before each test
+    await delay(2000);
   });
 
   it("should create room", function (done) {
