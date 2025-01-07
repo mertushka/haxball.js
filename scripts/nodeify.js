@@ -1,104 +1,141 @@
-const fs = require("fs");
+const fs = require("fs").promises;
+const path = require("path");
 
-fetch("https://www.haxball.com/cache_hash.json")
-  .then((body) => body.text())
-  .then(async (data) => {
-    const hash = data.replaceAll('"', "");
+async function nodeify() {
+  try {
+    // Fetch cache hash
+    const hashResponse = await fetch("https://www.haxball.com/cache_hash.json");
+    if (!hashResponse.ok)
+      throw new Error(`Failed to fetch hash: ${hashResponse.status}`);
+    const hash = (await hashResponse.text()).replaceAll('"', "");
 
-    let source = await (
-      await fetch(
-        `https://www.haxball.com/${hash}/__cache_static__/g/headless-min.js`
-      )
-    ).text();
+    // Fetch source
+    const sourceUrl = `https://www.haxball.com/${hash}/__cache_static__/g/headless-min.js`;
+    console.log(sourceUrl);
+    const sourceResponse = await fetch(sourceUrl);
+    if (!sourceResponse.ok)
+      throw new Error(`Failed to fetch source: ${sourceResponse.status}`);
+    let source = await sourceResponse.text();
 
-    const target = fs.createWriteStream("./src/build.js");
+    // Process source code
+    source = processSource(source);
 
-    // Remove <Window> references
-    source = source.replaceAll("window.", "");
-    source = source.replaceAll("parent.", "");
-    source = source.replaceAll("document.", "");
-    source = source.replaceAll(".innerHTML", "");
+    // Write output
+    const outputPath = path.join(__dirname, "../src/build.js");
+    await writeOutputFile(outputPath, source);
 
-    source = source.replaceAll('getElementById("roomlink")', "null");
-    source = source.replaceAll('getElementById("recaptcha")', "null");
+    console.log(`SUCCESS:${hash}`); // Special format for GitHub Actions
+    return hash;
+  } catch (error) {
+    console.error(`ERROR:${error.message}`);
+    process.exit(1);
+  }
+}
 
-    // Fix HBInit Callback (Regex)
-    const HBInitRegex = /HBInit=.+?;/; // Match the pattern "HBInit=...;"
-    const HBInitMatch = source.match(HBInitRegex)[0];
+function processSource(source) {
+  // Remove window references
+  source = removeWindowReferences(source);
 
-    if (HBInitMatch) {
-      const value = HBInitMatch.substring(7, HBInitMatch.length - 1); // Remove "HBInit=" and the trailing ";"
-      const updatedValue = `promiseResolve(${value});`;
+  // Apply regex replacements
+  source = applyRegexReplacements(source);
 
-      source = source.replace(HBInitMatch, updatedValue);
-    } else {
-      throw new Error("No HBInit matches found!");
-    }
+  // Add proxy support
+  source = addProxySupport(source);
 
-    // Fix Websocket & Add Proxy Support (Regex)
+  // Wrap with module code
+  return wrapWithModuleCode(source);
+}
 
-    const WebsocketRegex = /new WebSocket\([^)]+\);/; // Match the pattern "new WebSocket(f+"?token="+e);"
-    const WebsocketMatch = source.match(WebsocketRegex)[0];
+function removeWindowReferences(source) {
+  const replacements = {
+    "window.": "",
+    "parent.": "",
+    "document.": "",
+    ".innerHTML": "",
+    'getElementById("roomlink")': "null",
+    'getElementById("recaptcha")': "null",
+  };
 
-    if (WebsocketMatch) {
-      const updatedValue = WebsocketMatch.replace(
-        /new WebSocket\(([^)]+)\);/,
-        'new WebSocket($1, {headers:{origin: "https://html5.haxball.com"}, agent: proxyAgent});'
-      );
+  return Object.entries(replacements).reduce(
+    (text, [search, replace]) => text.replaceAll(search, replace),
+    source
+  );
+}
 
-      source = source.replace(WebsocketMatch, updatedValue);
-    } else {
-      throw new Error("No Websocket matches found!");
-    }
+function applyRegexReplacements(source) {
+  // HBInit replacement
+  const hbInitMatch = source.match(/HBInit=.+?;/);
+  if (!hbInitMatch) throw new Error("Failed to find HBInit pattern");
+  source = source.replace(
+    hbInitMatch[0],
+    `promiseResolve(${hbInitMatch[0].substring(7, hbInitMatch[0].length - 1)});`
+  );
 
-    // Remove recaptcha (Regex)
+  // WebSocket replacement
+  const wsMatch = source.match(/new WebSocket\([^)]+\);/);
+  if (!wsMatch) throw new Error("Failed to find WebSocket pattern");
+  source = source.replace(
+    wsMatch[0],
+    wsMatch[0].replace(
+      /new WebSocket\(([^)]+)\);/,
+      'new WebSocket($1, {headers:{origin: "https://html5.haxball.com"}, agent: proxyAgent});'
+    )
+  );
 
-    const RecaptchaRegex = /case "recaptcha":([a-zA-Z]+)\(([^)]+)\)/; // Match the pattern 'case "recaptcha":b(e)' method b and string e is random.
-    const RecaptchaMatch = source.match(RecaptchaRegex)[0];
+  // Add WebSocket error debug
+  const wsErrorPattern =
+    /([a-zA-Z]+)\.([a-zA-Z]+)\.onerror=function\(\){([a-zA-Z]+)\.([a-zA-Z]+)\(!0\)}/;
+  const wsErrorMatch = source.match(wsErrorPattern);
+  if (!wsErrorMatch) throw new Error("Failed to find WebSocket error handler");
 
-    if (RecaptchaMatch) {
-      const updatedValue = RecaptchaMatch.replace(
-        /case "recaptcha":([a-zA-Z]+)\(([^)]+)\)/,
-        'case "recaptcha":console.log(new Error("Invalid Token Provided!"))'
-      );
+  const [fullMatch, objName, wsProperty, methodObj, methodName] = wsErrorMatch;
+  const debugCode = `${objName}.${wsProperty}.onerror=function(err){${methodObj}.${methodName}(!0);debug && console.error(err)};`;
+  source = source.replace(fullMatch, debugCode);
 
-      source = source.replace(RecaptchaMatch, updatedValue);
-    } else {
-      throw new Error("No Recaptcha matches found!");
-    }
+  // Recaptcha replacement
+  const recaptchaMatch = source.match(
+    /case "recaptcha":([a-zA-Z]+)\(([^)]+)\)/
+  );
+  if (!recaptchaMatch) throw new Error("Failed to find Recaptcha pattern");
+  source = source.replace(
+    recaptchaMatch[0],
+    'case "recaptcha":console.log(new Error("Invalid Token Provided!"))'
+  );
 
-    /*console.log(
-      "RoomConfigLookup function:" + source.match(/(\w+)\("noPlayer",/)[1]
-    );*/
+  return source;
+}
 
-    // Add proxy support & other things manually because too hard to string manipulate with minified code
-    // Also these things are not included in Headless Host Source originally so you can create ur own build without these things
-    /* 
+function addProxySupport(source) {
+  // Find the initialization pattern with more flexible matching
+  const initPattern =
+    /if\s*\([A-Za-z]+\.[A-Za-z]+\)\s*throw\s+[A-Za-z]+\.[A-Za-z]+\s*\(\s*"Can't init twice"\s*\)\s*;\s*[A-Za-z]+\.[A-Za-z]+\s*=\s*!0\s*;/;
+  const initMatch = source.match(initPattern);
 
-    RoomConfigLookup: This is an example name for mimic minified function. 
-    
-    Example getting minified function: 
-    source.match(/(\w+)\("noPlayer",/)[1] -> this regex gets minified function's name from code
-    k("noPlayer", !1) -> in this example regex gets function's name as "k"
+  if (!initMatch) {
+    throw new Error("Could not find initialization pattern for proxy support");
+  }
 
+  // Get the RoomConfigLookup function name
+  const configLookupMatch = source.match(/(\w+)\("noPlayer",/);
+  if (!configLookupMatch) {
+    throw new Error("Could not find RoomConfigLookup function");
+  }
+  const configFn = configLookupMatch[1];
 
-    Implemented code to add proxy support to the module:
+  // Add proxy support code after initialization
+  const proxyCode = `${initMatch[0].slice(
+    0,
+    -3
+  )}!0;proxyAgent = ${configFn}("proxy", null) ? new HttpsProxyAgent(url.parse(${configFn}("proxy", null))) : null; debug = ${configFn}("debug", null) == true;`;
 
-    proxyAgent = RoomConfigLookup("proxy", null)
-    ? new HttpsProxyAgent(url.parse(RoomConfigLookup("proxy", null)))
-    : null;
-    debug = RoomConfigLookup("debug", null) == true;
+  // Replace the entire initialization block
+  source = source.replace(initMatch[0], proxyCode);
 
+  return source;
+}
 
-    
-    Websocket On Error Debug -> debug && console.error(e);
-
-    I will implement these manually with the help of the regex, as you can check manually added codes by searching @mertushka on the code 
-    
-    */
-
-    // Modules
-    target.write(`const WebSocket = require("ws");
+function wrapWithModuleCode(source) {
+  const header = `const WebSocket = require("ws");
 const XMLHttpRequest = require("xhr2");
 const JSON5 = require("json5");
 const url = require("url");
@@ -121,21 +158,18 @@ const onHBLoaded = function (cb) {
   return cb;
 };
 
-/*
- Builded & Automated with Haxball.JS Nodeify Script
-*/
+/* Builded & Automated with Haxball.JS Nodeify Script */
 
-`);
+`;
 
-    // Update Source
-    target.write(source);
+  const footer = `\nmodule.exports = HBLoaded;`;
 
-    // Export HBInit Promise
-    target.write(`
-module.exports = HBLoaded;`);
+  return header + source + footer;
+}
 
-    //console.log("Done!");
+async function writeOutputFile(outputPath, content) {
+  await fs.mkdir(path.dirname(outputPath), { recursive: true });
+  await fs.writeFile(outputPath, content, "utf8");
+}
 
-    console.log(hash);
-    return hash;
-  });
+nodeify();

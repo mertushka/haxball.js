@@ -1,74 +1,98 @@
-name: Node.js CI
+name: Haxball.JS Build
 
 on:
+  schedule:
+    - cron: "0 0 * * 0" # Run at 00:00 on Sunday
+  workflow_dispatch: # Allow manual triggers
   push:
-    branches:
-      - actions
+    branches: [main, actions]
   pull_request:
-    branches:
-      - actions
+    branches: [main]
 
 jobs:
-  nodeify:
+  test:
+    name: Test on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         node-version: [18.x, 20.x]
+      fail-fast: false # Continue with other tests even if one fails
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          cache: "npm"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Run nodeify script and set HASH
+      - name: Run required tests
+        run: npm test
+        env:
+          TEST_PROXY: "" # Don't run proxy tests by default
+
+      - name: Run proxy tests (optional)
+        if: always() # Run even if previous step failed
+        continue-on-error: true # Continue workflow even if proxy tests fail
+        run: npm test
+        env:
+          TEST_PROXY: "1"
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run nodeify script
         id: nodeify
         run: |
-          if [ "$RUNNER_OS" = "Windows" ]; then
-              $HASH = node scripts/nodeify.js
-              echo "HASH=$HASH" | Out-File -FilePath $env:GITHUB_ENV -Append
+          OUTPUT=$(node scripts/nodeify.js)
+          if [[ $OUTPUT =~ SUCCESS:([a-zA-Z0-9]+) ]]; then
+            HASH="${BASH_REMATCH[1]}"
+            echo "hash=$HASH" >> $GITHUB_OUTPUT
+            echo "Build successful with hash: $HASH"
           else
-              HASH=$(node scripts/nodeify.js)
-              echo "HASH=$HASH" >> $GITHUB_ENV
+            echo "Build failed: $OUTPUT"
+            exit 1
           fi
 
-      - name: Run tests
-        run: npm test
-        continue-on-error: false
-
-      - name: Rename build.js to index.js if tests pass
-        if: success()
+      - name: Prepare build artifact
         run: |
-          if [ "$RUNNER_OS" = "Windows" ]; then
-            Move-Item src\build.js src\index.js
+          mv src/build.js src/index.js
+          echo "Renamed build.js to index.js"
+
+      - name: Commit and push if changed
+        if: github.event_name != 'pull_request'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git add src/index.js
+            git commit -m "Update build (${{ steps.nodeify.outputs.hash }})"
+            git push
           else
-            mv src/build.js src/index.js
+            echo "No changes to commit"
           fi
-          echo "Renamed src/build.js to src/index.js"
 
-  commit:
-    runs-on: ubuntu-latest
-    needs: nodeify # This ensures the commit job only runs after all tests pass
-    if: success() # Only run if all previous jobs pass
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Configure Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Commit changes if renaming was successful
-        run: |
-          git add src/index.js
-          git commit -m "Update (${{ env.HASH }})"  # Include the hash in commit message
-          git push origin ${{ github.ref }}  # Push changes to the remote repository
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: haxball-build
+          path: src/index.js
+          retention-days: 7
