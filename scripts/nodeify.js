@@ -7,7 +7,7 @@ async function nodeify() {
     const hashResponse = await fetch("https://www.haxball.com/cache_hash.json");
     if (!hashResponse.ok)
       throw new Error(`Failed to fetch hash: ${hashResponse.status}`);
-    const hash = (await hashResponse.text()).replaceAll('"', "");
+    let hash = (await hashResponse.text()).replaceAll('"', "");
 
     // Fetch source
     const sourceUrl = `https://www.haxball.com/${hash}/__cache_static__/g/headless-min.js`;
@@ -15,6 +15,10 @@ async function nodeify() {
     if (!sourceResponse.ok)
       throw new Error(`Failed to fetch source: ${sourceResponse.status}`);
     let source = await sourceResponse.text();
+
+    // Extract hash from source header comment
+    const hashMatch = source.match(/\/\*[\s\S]*?(\b[a-f0-9]{8}\b)/);
+    hash = hashMatch?.[1];
 
     // Process source code
     source = processSource(source);
