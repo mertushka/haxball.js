@@ -1,13 +1,19 @@
 name: 🚀 Haxball.JS CI/CD
 
 on:
-  schedule:
-    - cron: "0 0 * * 0" # Run at 00:00 on Sunday
   workflow_dispatch: # Allow manual triggers
   push:
     branches: [main, develop]
+    paths:
+      - "scripts/nodeify.js"
+      - "package.json"
+      - "package-lock.json"
   pull_request:
     branches: [main]
+    paths:
+      - "scripts/nodeify.js"
+      - "package.json"
+      - "package-lock.json"
 
 jobs:
   build:
