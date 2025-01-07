@@ -98,7 +98,7 @@ jobs:
           CI_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
 
   publish:
-    needs: build
+    needs: [build, test]
     name: 📢 Publish Build
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
