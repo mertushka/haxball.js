@@ -144,6 +144,7 @@ bun index.ts
 
 - Make a fork of this repository
 - Clone to you machine and entry on respective paste
+- Make sure to update testing token on `test/room.js` with a valid one for Github Actions CI/CD (Important)
 - Create a branch from develop: `git checkout -b my-feature develop`
 - Commit your changes: `git commit -m 'feat: My new feature'`
 - Push your branch: `git push origin my-feature`
