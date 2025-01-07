@@ -29,11 +29,9 @@
 npm install haxball.js
 ```
 
-#### 💻 Module Usage Example
+#### Module Usage Example
 
 ```js
-// room.js
-
 const HaxballJS = require("haxball.js");
 
 HaxballJS.then((HBInit) => {
@@ -56,9 +54,9 @@ HaxballJS.then((HBInit) => {
 });
 ```
 
-#### 💻 (Optional) Proxy
+#### (Optional) Proxy
 
-Haxball has a limit of 2 rooms per IP. Therefore, you can use proxy with adding `proxy: "<YOUR_PROXY_IP>"` in your RoomConfig.
+Haxball has a limit of 2 rooms per IP. Therefore, you can use proxy with adding `proxy: "http://<YOUR_PROXY_IP>"` in your `RoomConfig`.
 
 Example:
 
@@ -69,42 +67,53 @@ HBInit({
 });
 ```
 
-#### 💻 (Optional) TypeScript
+### 💻 TypeScript
 
-From v2.1.0, the package has basic typings included. Typings are automatically imported alongside `haxball.js` package.
+#### TypeScript Example
 
-Install TypeScript and ts-node in your project:
+```js
+import HaxballJS from "haxball.js";
 
-```bash
-npm install typescript --save-dev
-npm install ts-node --save-dev
+HaxballJS.then((HBInit) => {
+  // Same as in Haxball Headless Host Documentation
+  const room = HBInit({
+    roomName: "Haxball.JS",
+    maxPlayers: 16,
+    public: true,
+    noPlayer: true,
+    token: "YOUR_TOKEN_HERE", // Required
+  });
+
+  room.setDefaultStadium("Big");
+  room.setScoreLimit(5);
+  room.setTimeLimit(0);
+
+  room.onRoomLink = function (link) {
+    console.log(link);
+  };
+});
 ```
 
-Name the file `room.ts` instead of `room.js` and use example room code from the previous section.
+#### 💻 (Optional, Highly Experimental!) Bun
 
-You may run the server with `ts-node room.ts` instead of `node room.js`. To make it runnable with `npm start`, add the alias to `package.json`:
+It's highly experimental and risky to use it in a production environment, but `haxball.js` is compatible with [Bun.JS](https://bun.sh/).
 
-```json
-// package.json
-
-//...
-  "scripts": {
-    "start": "ts-node run.ts"
-  }
-//...
+```bash
+bun install haxball.js
+bun index.ts
 ```
 
 ---
 
 <h2 id="technologies">🚀 Technologies</h2>
 
-- wrtc - WebRTC implementation for NodeJS
+- node-datachannel - WebRTC implementation for Node.JS
 - ws - Websocket Connection
 - json5 - JSON Helper Module
-- @peculiar/webcrypto - Webcrypto implementation for NodeJS
+- @peculiar/webcrypto - WebCrypto implementation for Node.JS
 - pako - ZLIB port for NodeJS
-- xhr2 - W3C XMLHttpRequest implementation for NodeJS
-- http-proxy-agent - Websocket Proxy Support
+- xhr2 - W3C XMLHttpRequest implementation for Node.JS
+- https-proxy-agent - Websocket Proxy Support
 - @types/haxball-headless-browser - Type definitions
 
 [Back To The Top](#title)
@@ -135,7 +144,7 @@ You may run the server with `ts-node room.ts` instead of `node room.js`. To make
 
 - Make a fork of this repository
 - Clone to you machine and entry on respective paste
-- Create a branch with your resource: `git checkout -b my-feature`
+- Create a branch from develop: `git checkout -b my-feature develop`
 - Commit your changes: `git commit -m 'feat: My new feature'`
 - Push your branch: `git push origin my-feature`
 - A green button will appear at the beginning of this repository
@@ -167,12 +176,8 @@ You may run the server with `ts-node room.ts` instead of `node room.js`. To make
 
 <h2 id="license">🔏 License</h2>
 
-Copyright © 2023 [Mertushka <mertushka@proton.me>](https://github.com/mertushka)
+Copyright © 2023 mertushka & basro
 
 This project is licensed by [MIT License](https://api.github.com/licenses/mit).
 
 [Back To The Top](#title)
-
----
-
-_This README was generated with 💟 by [readme-template-generator](https://github.com/mertushka/readme-template-generator)_
