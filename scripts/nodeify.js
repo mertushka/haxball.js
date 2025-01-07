@@ -11,7 +11,6 @@ async function nodeify() {
 
     // Fetch source
     const sourceUrl = `https://www.haxball.com/${hash}/__cache_static__/g/headless-min.js`;
-    console.log(sourceUrl);
     const sourceResponse = await fetch(sourceUrl);
     if (!sourceResponse.ok)
       throw new Error(`Failed to fetch source: ${sourceResponse.status}`);
