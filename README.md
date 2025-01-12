@@ -100,6 +100,7 @@ It's highly experimental and risky to use it in a production environment, but `h
 
 ```bash
 bun install haxball.js
+bun pm trust node-datachannel
 bun index.ts
 ```
 
