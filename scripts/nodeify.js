@@ -1,13 +1,13 @@
-const fs = require("fs").promises;
-const path = require("path");
+const fs = require('fs').promises;
+const path = require('path');
 
 async function nodeify() {
   try {
     // Fetch cache hash
-    const hashResponse = await fetch("https://www.haxball.com/cache_hash.json");
+    const hashResponse = await fetch('https://www.haxball.com/cache_hash.json');
     if (!hashResponse.ok)
       throw new Error(`Failed to fetch hash: ${hashResponse.status}`);
-    let hash = (await hashResponse.text()).replaceAll('"', "");
+    let hash = (await hashResponse.text()).replaceAll('"', '');
 
     // Fetch source
     const sourceUrl = `https://www.haxball.com/${hash}/__cache_static__/g/headless-min.js`;
@@ -24,7 +24,7 @@ async function nodeify() {
     source = processSource(source);
 
     // Write output
-    const outputPath = path.join(__dirname, "../src/build.js");
+    const outputPath = path.join(__dirname, '../src/build.js');
     await writeOutputFile(outputPath, source);
 
     console.log(`SUCCESS:${hash}`); // Special format for GitHub Actions
@@ -51,12 +51,12 @@ function processSource(source) {
 
 function removeWindowReferences(source) {
   const replacements = {
-    "window.": "",
-    "parent.": "",
-    "document.": "",
-    ".innerHTML": "",
-    'getElementById("roomlink")': "null",
-    'getElementById("recaptcha")': "null",
+    'window.': '',
+    'parent.': '',
+    'document.': '',
+    '.innerHTML': '',
+    'getElementById("roomlink")': 'null',
+    'getElementById("recaptcha")': 'null',
   };
 
   return Object.entries(replacements).reduce(
@@ -68,7 +68,7 @@ function removeWindowReferences(source) {
 function applyRegexReplacements(source) {
   // HBInit replacement
   const hbInitMatch = source.match(/HBInit=.+?;/);
-  if (!hbInitMatch) throw new Error("Failed to find HBInit pattern");
+  if (!hbInitMatch) throw new Error('Failed to find HBInit pattern');
   source = source.replace(
     hbInitMatch[0],
     `promiseResolve(${hbInitMatch[0].substring(7, hbInitMatch[0].length - 1)});`
@@ -76,7 +76,7 @@ function applyRegexReplacements(source) {
 
   // WebSocket replacement
   const wsMatch = source.match(/new WebSocket\([^)]+\);/);
-  if (!wsMatch) throw new Error("Failed to find WebSocket pattern");
+  if (!wsMatch) throw new Error('Failed to find WebSocket pattern');
   source = source.replace(
     wsMatch[0],
     wsMatch[0].replace(
@@ -89,7 +89,7 @@ function applyRegexReplacements(source) {
   const wsErrorPattern =
     /([a-zA-Z]+)\.([a-zA-Z]+)\.onerror=function\(\){([a-zA-Z]+)\.([a-zA-Z]+)\(!0\)}/;
   const wsErrorMatch = source.match(wsErrorPattern);
-  if (!wsErrorMatch) throw new Error("Failed to find WebSocket error handler");
+  if (!wsErrorMatch) throw new Error('Failed to find WebSocket error handler');
 
   const [fullMatch, objName, wsProperty, methodObj, methodName] = wsErrorMatch;
   const debugCode = `${objName}.${wsProperty}.onerror=function(err){${methodObj}.${methodName}(!0);debug && console.error(err)};`;
@@ -99,7 +99,7 @@ function applyRegexReplacements(source) {
   const recaptchaMatch = source.match(
     /case "recaptcha":([a-zA-Z]+)\(([^)]+)\)/
   );
-  if (!recaptchaMatch) throw new Error("Failed to find Recaptcha pattern");
+  if (!recaptchaMatch) throw new Error('Failed to find Recaptcha pattern');
   source = source.replace(
     recaptchaMatch[0],
     'case "recaptcha":console.log(new Error("Invalid Token Provided!"))'
@@ -115,13 +115,13 @@ function addProxySupport(source) {
   const initMatch = source.match(initPattern);
 
   if (!initMatch) {
-    throw new Error("Could not find initialization pattern for proxy support");
+    throw new Error('Could not find initialization pattern for proxy support');
   }
 
   // Get the RoomConfigLookup function name
   const configLookupMatch = source.match(/(\w+)\("noPlayer",/);
   if (!configLookupMatch) {
-    throw new Error("Could not find RoomConfigLookup function");
+    throw new Error('Could not find RoomConfigLookup function');
   }
   const configFn = configLookupMatch[1];
 
@@ -172,7 +172,7 @@ const onHBLoaded = function (cb) {
 
 async function writeOutputFile(outputPath, content) {
   await fs.mkdir(path.dirname(outputPath), { recursive: true });
-  await fs.writeFile(outputPath, content, "utf8");
+  await fs.writeFile(outputPath, content, 'utf8');
 }
 
 nodeify();

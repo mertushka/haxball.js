@@ -5,7 +5,7 @@ function requireUncached(module) {
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-describe("HBInit Tests", function () {
+describe('HBInit Tests', function () {
   this.timeout(10000);
 
   beforeEach(async function () {
@@ -14,11 +14,11 @@ describe("HBInit Tests", function () {
 
   (process.env.CI_HB_HEADLESS_TOKEN || process.env.TEST_HB_HEADLESS_TOKEN
     ? it
-    : it.skip)("should create room", function (done) {
+    : it.skip)('should create room', function (done) {
     this.timeout(30000);
-    requireUncached("../src/build").then((HBInit) => {
+    requireUncached('../src/build').then((HBInit) => {
       let room = HBInit({
-        roomName: "Haxball.JS",
+        roomName: 'Haxball.JS',
         maxPlayers: 16,
         public: false,
         noPlayer: true,
@@ -36,15 +36,15 @@ describe("HBInit Tests", function () {
 
   // Optional proxy test
   (process.env.CI_HB_PROXY || process.env.TEST_HB_PROXY ? it : it.skip)(
-    "should create room (proxy)",
+    'should create room (proxy)',
     function (done) {
       this.timeout(30000);
 
-      if (process.env.CI_HB_PROXY == "1") return done(); // Skip since testing proxy on GitHub Actions is not practical, test this locally instead
+      if (process.env.CI_HB_PROXY == '1') return done(); // Skip since testing proxy on GitHub Actions is not practical, test this locally instead
 
-      requireUncached("../src/build").then((HBInit) => {
+      requireUncached('../src/build').then((HBInit) => {
         let room = HBInit({
-          roomName: "Haxball.JS",
+          roomName: 'Haxball.JS',
           maxPlayers: 16,
           public: false,
           noPlayer: true,

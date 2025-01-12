@@ -2,20 +2,20 @@ name: 🚀 Haxball.JS CI/CD
 
 on:
   schedule:
-    - cron: "0 0 * * 0" # Run at 00:00 on Sunday
+    - cron: '0 0 * * 0' # Run at 00:00 on Sunday
   workflow_dispatch: # Allow manual triggers
   push:
-    branches: [main, develop]
+    branches: [main]
     paths:
-      - "scripts/nodeify.js"
-      - "package.json"
-      - "package-lock.json"
+      - 'scripts/nodeify.js'
+      - 'package.json'
+      - 'package-lock.json'
   pull_request:
     branches: [main]
     paths:
-      - "scripts/nodeify.js"
-      - "package.json"
-      - "package-lock.json"
+      - 'scripts/nodeify.js'
+      - 'package.json'
+      - 'package-lock.json'
 
 jobs:
   build:
@@ -30,7 +30,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 22.x
-          cache: "npm"
+          cache: 'npm'
 
       - name: 📥 Install Dependencies
         run: npm ci
@@ -72,7 +72,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
+          cache: 'npm'
 
       - name: 📥 Download Build
         uses: actions/download-artifact@v3
@@ -86,7 +86,6 @@ jobs:
       - name: 🧪 Run Core Tests
         run: npm test
         env:
-          CI_HB_PROXY: ""
           CI_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
 
       - name: 🌐 Run Proxy Tests (Optional)
@@ -94,7 +93,7 @@ jobs:
         continue-on-error: true
         run: npm test
         env:
-          CI_HB_PROXY: "1"
+          CI_HB_PROXY: '1'
           CI_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
 
   publish:

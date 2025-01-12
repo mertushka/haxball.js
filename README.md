@@ -32,19 +32,19 @@ npm install haxball.js
 #### Module Usage Example
 
 ```js
-const HaxballJS = require("haxball.js");
+const HaxballJS = require('haxball.js');
 
 HaxballJS.then((HBInit) => {
   // Same as in Haxball Headless Host Documentation
   const room = HBInit({
-    roomName: "Haxball.JS",
+    roomName: 'Haxball.JS',
     maxPlayers: 16,
     public: true,
     noPlayer: true,
-    token: "YOUR_TOKEN_HERE", // Required
+    token: 'YOUR_TOKEN_HERE', // Required
   });
 
-  room.setDefaultStadium("Big");
+  room.setDefaultStadium('Big');
   room.setScoreLimit(5);
   room.setTimeLimit(0);
 
@@ -72,19 +72,19 @@ HBInit({
 #### TypeScript Example
 
 ```js
-import HaxballJS from "haxball.js";
+import HaxballJS from 'haxball.js';
 
 HaxballJS.then((HBInit) => {
   // Same as in Haxball Headless Host Documentation
   const room = HBInit({
-    roomName: "Haxball.JS",
+    roomName: 'Haxball.JS',
     maxPlayers: 16,
     public: true,
     noPlayer: true,
-    token: "YOUR_TOKEN_HERE", // Required
+    token: 'YOUR_TOKEN_HERE', // Required
   });
 
-  room.setDefaultStadium("Big");
+  room.setDefaultStadium('Big');
   room.setScoreLimit(5);
   room.setTimeLimit(0);
 
@@ -144,8 +144,7 @@ bun index.ts
 
 - Make a fork of this repository
 - Clone to you machine and entry on respective paste
-- Make sure to update testing token on `test/room.js` with a valid one for Github Actions CI/CD (Important)
-- Create a branch from develop: `git checkout -b my-feature develop`
+- Create a branch with your resource: `git checkout -b my-feature`
 - Commit your changes: `git commit -m 'feat: My new feature'`
 - Push your branch: `git push origin my-feature`
 - A green button will appear at the beginning of this repository
