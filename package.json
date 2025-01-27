@@ -30,7 +30,7 @@
     "xhr2": "^0.2.1"
   },
   "devDependencies": {
-    "@mapbox/node-pre-gyp": "^1.0.11",
+    "@mapbox/node-pre-gyp": "^2.0.0",
     "mocha": "^10.7.3"
   },
   "repository": {
