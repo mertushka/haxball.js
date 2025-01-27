@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@mapbox/node-pre-gyp": "^2.0.0",
-    "mocha": "^10.7.3"
+    "mocha": "^11.1.0"
   },
   "repository": {
     "type": "git",
