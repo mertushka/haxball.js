@@ -34,7 +34,7 @@ npm install haxball.js
 ```js
 const HaxballJS = require('haxball.js');
 
-HaxballJS.then((HBInit) => {
+HaxballJS().then((HBInit) => {
   // Same as in Haxball Headless Host Documentation
   const room = HBInit({
     roomName: 'Haxball.JS',
@@ -52,6 +52,19 @@ HaxballJS.then((HBInit) => {
     console.log(link);
   };
 });
+```
+
+#### (Optional) Custom WebRTC Library
+
+Haxball.JS uses `node-datachannel` as the default WebRTC library. However, you can use a custom WebRTC implementation by specifying it in the HaxballJS promise using the `webrtc` option.
+
+Example:
+
+```js
+const HaxballJS = require('haxball.js');
+const WebRTC = require('webrtc');
+
+HaxballJS({ webrtc: WebRTC }).then((HBInit) => {...});
 ```
 
 #### (Optional) Proxy
@@ -74,24 +87,7 @@ HBInit({
 ```js
 import HaxballJS from 'haxball.js';
 
-HaxballJS.then((HBInit) => {
-  // Same as in Haxball Headless Host Documentation
-  const room = HBInit({
-    roomName: 'Haxball.JS',
-    maxPlayers: 16,
-    public: true,
-    noPlayer: true,
-    token: 'YOUR_TOKEN_HERE', // Required
-  });
-
-  room.setDefaultStadium('Big');
-  room.setScoreLimit(5);
-  room.setTimeLimit(0);
-
-  room.onRoomLink = function (link) {
-    console.log(link);
-  };
-});
+HaxballJS().then((HBInit) => {...});
 ```
 
 #### 💻 (Optional, Highly Experimental!) Bun

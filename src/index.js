@@ -6,16 +6,23 @@ const pako = require("pako");
 const { HttpsProxyAgent } = require("https-proxy-agent");
 const { Crypto } = require("@peculiar/webcrypto");
 const { performance } = require("perf_hooks");
-const { RTCPeerConnection, RTCIceCandidate, RTCSessionDescription } = require("node-datachannel/polyfill");
+let { RTCPeerConnection, RTCIceCandidate, RTCSessionDescription } = require("node-datachannel/polyfill");
 const crypto = new Crypto();
 
 var promiseResolve;
 var proxyAgent;
 var debug = false;
 
-const HBLoaded = new Promise(function (resolve, reject) {
+const HBLoaded = (config) => {
+  if(config?.webrtc) {
+    RTCPeerConnection = config.webrtc.RTCPeerConnection;
+    RTCIceCandidate = config.webrtc.RTCIceCandidate;
+    RTCSessionDescription = config.webrtc.RTCSessionDescription;
+  }
+  return new Promise(function (resolve, reject) {
   promiseResolve = resolve;
-});
+  });
+}
 
 const onHBLoaded = function (cb) {
   return cb;
