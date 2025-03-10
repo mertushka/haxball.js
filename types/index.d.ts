@@ -5,6 +5,7 @@ interface HaxballJSConfig {
 }
 
 interface RoomConfigObjectM extends RoomConfigObject {
+  token: string;
   proxy?: string;
   debug?: boolean;
 }
