@@ -16,7 +16,7 @@ describe('HBInit Tests', function () {
     ? it
     : it.skip)('should create room', function (done) {
     this.timeout(30000);
-    requireUncached('../src/build').then((HBInit) => {
+    requireUncached('../src/build')().then((HBInit) => {
       let room = HBInit({
         roomName: 'Haxball.JS',
         maxPlayers: 16,
@@ -42,7 +42,7 @@ describe('HBInit Tests', function () {
 
       if (process.env.CI_HB_PROXY == '1') return done(); // Skip since testing proxy on GitHub Actions is not practical, test this locally instead
 
-      requireUncached('../src/build').then((HBInit) => {
+      requireUncached('../src/build')().then((HBInit) => {
         let room = HBInit({
           roomName: 'Haxball.JS',
           maxPlayers: 16,
