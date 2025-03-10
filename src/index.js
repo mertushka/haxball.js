@@ -6,8 +6,9 @@ const pako = require("pako");
 const { HttpsProxyAgent } = require("https-proxy-agent");
 const { Crypto } = require("@peculiar/webcrypto");
 const { performance } = require("perf_hooks");
-let { RTCPeerConnection, RTCIceCandidate, RTCSessionDescription } = require("node-datachannel/polyfill");
 const crypto = new Crypto();
+
+let { RTCPeerConnection, RTCIceCandidate, RTCSessionDescription } = require("node-datachannel/polyfill");
 
 var promiseResolve;
 var proxyAgent;
