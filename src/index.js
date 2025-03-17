@@ -32,7 +32,7 @@ const onHBLoaded = function (cb) {
 /* Builded & Automated with Haxball.JS Nodeify Script */
 
 /*
- HaxBall @ 2024 - Mario Carbajal - All rights reserved.
+ HaxBall © Mario Carbajal - All rights reserved.
  8be54ed5
 */
 'use strict';(function(va){function ob(){return q.Zb(this,"")}function hb(a,b){if(null==b)return null;null==b.xd&&(b.xd=va.ye++);var c;null==a.oe?a.oe={}:c=a.oe[b.xd];null==c&&(c=b.bind(a),a.oe[b.xd]=c);return c}class pb{static Bh(a){a=a.split(" ");let b=a[4];if("typ"!=a[6])throw r.s(null);return{ni:a[7],fh:b}}}class A{constructor(a,b){null==b&&(b=!1);this.j=a;this.ra=b;this.a=0}fe(){let a=new ArrayBuffer(this.a),b=new Uint8Array(this.j.buffer,this.j.byteOffset,this.a);(new Uint8Array(a)).set(b);
