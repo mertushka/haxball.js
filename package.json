@@ -1,6 +1,6 @@
 {
   "name": "haxball.js",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "A powerful library for interacting with the Haxball Headless API",
   "main": "src/index.js",
   "types": "types/index.d.ts",
@@ -20,7 +20,7 @@
   "author": "mertushka",
   "license": "MIT",
   "dependencies": {
-    "@mertushka/node-datachannel": "^0.29.0",
+    "@mertushka/node-datachannel": "^0.30.0",
     "@peculiar/webcrypto": "^1.5.0",
     "@types/haxball-headless-browser": "^0.4.0",
     "https-proxy-agent": "^7.0.6",
