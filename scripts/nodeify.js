@@ -148,7 +148,7 @@ const { Crypto } = require("@peculiar/webcrypto");
 const { performance } = require("perf_hooks");
 const crypto = new Crypto();
 
-let { RTCPeerConnection, RTCIceCandidate, RTCSessionDescription } = require("node-datachannel/polyfill");
+let { RTCPeerConnection, RTCIceCandidate, RTCSessionDescription } = require("@mertushka/node-datachannel/polyfill");
 
 var promiseResolve;
 var proxyAgent;
