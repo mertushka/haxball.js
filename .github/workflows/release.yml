@@ -24,7 +24,12 @@ jobs:
 
       - name: 🚀 Publish to NPM
         run: |
-          echo "📦 Publishing version $(node -p "require('./package.json').version")"
+          VERSION=$(node -p "require('./package.json').version")
+          echo "📦 Preparing to publish version $VERSION"
+          if [[ "$VERSION" == *-* ]]; then
+            echo "⛔ Pre-release version detected [$VERSION], skipping publish."
+            exit 0
+          fi
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
