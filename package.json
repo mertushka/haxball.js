@@ -1,6 +1,6 @@
 {
   "name": "haxball.js",
-  "version": "3.2.0-dev.2",
+  "version": "3.2.0",
   "description": "A powerful library for interacting with the Haxball Headless API",
   "main": "src/index.js",
   "types": "types/index.d.ts",
