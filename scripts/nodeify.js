@@ -154,15 +154,17 @@ var promiseResolve;
 var proxyAgent;
 var debug = false;
 
+const HBInit = new Promise(function (resolve, reject) {
+  promiseResolve = resolve;
+});
+
 const HBLoaded = (config) => {
   if(config?.webrtc) {
     RTCPeerConnection = config.webrtc.RTCPeerConnection;
     RTCIceCandidate = config.webrtc.RTCIceCandidate;
     RTCSessionDescription = config.webrtc.RTCSessionDescription;
   }
-  return new Promise(function (resolve, reject) {
-  promiseResolve = resolve;
-  });
+  return HBInit;
 }
 
 const onHBLoaded = function (cb) {
