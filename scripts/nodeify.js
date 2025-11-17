@@ -67,7 +67,7 @@ function removeWindowReferences(source) {
 
 function applyRegexReplacements(source) {
   // HBInit replacement
-  const hbInitMatch = source.match(/HBInit=.+?;/);
+  const hbInitMatch = source.match(/HBInit\s*=\s*.+?;/);
   if (!hbInitMatch) throw new Error('Failed to find HBInit pattern');
   source = source.replace(
     hbInitMatch[0],

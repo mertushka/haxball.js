@@ -26,12 +26,12 @@
     "https-proxy-agent": "^7.0.6",
     "json5": "^2.2.3",
     "pako": "^2.1.0",
-    "ws": "^8.18.0",
+    "ws": "^8.18.3",
     "xhr2": "^0.2.1"
   },
   "devDependencies": {
     "@mapbox/node-pre-gyp": "^2.0.0",
-    "mocha": "^11.1.0"
+    "mocha": "^11.7.5"
   },
   "repository": {
     "type": "git",
@@ -42,6 +42,7 @@
   },
   "homepage": "https://github.com/mertushka/haxball.js#readme",
   "trustedDependencies": [
+    "@mertushka/node-datachannel",
     "node-datachannel"
   ]
 }
