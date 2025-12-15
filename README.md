@@ -15,8 +15,6 @@
 - 🌱 [Minimal Requirements](#minimal-requirements)
 - 🎊 [Features](#features)
 - 💡 [How To Contribute](#how-to-contribute)
-- 🤗 [Contributors](#contributors)
-- 👤 [Author](#author)
 - 🔏 [License](#license)
 
 ---
@@ -35,28 +33,45 @@ npm install haxball.js
 const HaxballJS = require('haxball.js');
 
 HaxballJS().then((HBInit) => {
-  // Same as in Haxball Headless Host Documentation
-  const room = HBInit({
-    roomName: 'Haxball.JS',
-    maxPlayers: 16,
-    public: true,
-    noPlayer: true,
-    token: 'YOUR_TOKEN_HERE', // Required
-  });
+	// Same as in Haxball Headless Host Documentation
+	const room = HBInit({
+		roomName: 'Haxball.JS',
+		maxPlayers: 16,
+		public: true,
+		noPlayer: true,
+		token: 'YOUR_TOKEN_HERE', // Required
+	});
 
-  room.setDefaultStadium('Big');
-  room.setScoreLimit(5);
-  room.setTimeLimit(0);
+	room.setDefaultStadium('Big');
+	room.setScoreLimit(5);
+	room.setTimeLimit(0);
 
-  room.onRoomLink = function (link) {
-    console.log(link);
-  };
+	room.onRoomLink = function (link) {
+		console.log(link);
+	};
+
+	// If there are no admins left in the room give admin to one of the remaining players.
+	function updateAdmins() {
+		// Get all players
+		var players = room.getPlayerList();
+		if (players.length == 0) return; // No players left, do nothing.
+		if (players.find((player) => player.admin) != null) return; // There's an admin left so do nothing.
+		room.setPlayerAdmin(players[0].id, true); // Give admin to the first non admin player in the list
+	}
+
+	room.onPlayerJoin = function (player) {
+		updateAdmins();
+	};
+
+	room.onPlayerLeave = function (player) {
+		updateAdmins();
+	};
 });
 ```
 
 #### (Optional) Custom WebRTC Library
 
-Haxball.JS uses `node-datachannel` as the default WebRTC library. However, you can use a custom WebRTC implementation by specifying it in the HaxballJS promise using the `webrtc` option.
+Haxball.JS uses `node-datachannel` as the default WebRTC library. However, you can use a custom WebRTC implementation by specifying it in the HaxballJS config using the `webrtc` option.
 
 Example:
 
@@ -69,15 +84,13 @@ HaxballJS({ webrtc: WebRTC }).then((HBInit) => {...});
 
 #### (Optional) Proxy
 
-Haxball has a limit of 2 rooms per IP. Therefore, you can use proxy with adding `proxy: "http://<YOUR_PROXY_IP>"` in your `RoomConfig`.
+Haxball has a limit of 2 rooms per IP. Therefore, you can use proxy with adding `proxy: "http://<YOUR_PROXY_IP>"` in your HaxballJS config.
 
 Example:
 
 ```js
-HBInit({
-    ...
-    proxy: "http://1.1.1.1:80",
-});
+HaxballJS({ proxy: "http://1.1.1.1:80", }).then((HBInit) => {...});
+
 ```
 
 ### 💻 TypeScript
@@ -90,7 +103,7 @@ import HaxballJS from 'haxball.js';
 HaxballJS().then((HBInit) => {...});
 ```
 
-#### 💻 (Optional, Highly Experimental!) Bun
+#### 💻 Bun
 
 It's highly experimental and risky to use it in a production environment, but `haxball.js` is compatible with [Bun.JS](https://bun.sh/).
 
@@ -108,7 +121,7 @@ bun index.ts
 - ws - Websocket Connection
 - json5 - JSON Helper Module
 - @peculiar/webcrypto - WebCrypto implementation for Node.JS
-- pako - ZLIB port for NodeJS
+- pako - ZLIB port for Node.JS
 - xhr2 - W3C XMLHttpRequest implementation for Node.JS
 - https-proxy-agent - Websocket Proxy Support
 - @types/haxball-headless-browser - Type definitions
@@ -128,8 +141,6 @@ bun index.ts
 
 <h2 id="features">🎊 Features</h2>
 
-- [x] Promise based
-- [x] Synchronous
 - [x] Performant
 - [x] Strongly Typed
 
@@ -139,13 +150,7 @@ bun index.ts
 
 <h2 id="how-to-contribute">💡 How To Contribute</h2>
 
-- Make a fork of this repository
-- Clone to you machine and entry on respective paste
-- Create a branch with your resource: `git checkout -b my-feature`
-- Commit your changes: `git commit -m 'feat: My new feature'`
-- Push your branch: `git push origin my-feature`
-- A green button will appear at the beginning of this repository
-- Click to open and fill in the pull request information
+Please check [CONTRIBUTING.md](/CONTRIBUTING.md)
 
 <p align="center">
 <i>Contributions, issues and features requests are welcome!</i><br />
@@ -158,23 +163,8 @@ bun index.ts
 
 ---
 
-<h2 id="contributors">🤗 Contributors</h2>
-
-<p>
-
-<a href="https://github.com/mertushka"><img width="60" src="https://avatars1.githubusercontent.com/u/34413473?v=4"/>
-<a href="https://github.com/jakjus"><img width="60" src="https://avatars.githubusercontent.com/u/43467994?v=4"/>
-
-</p>
-
-[Back To The Top](#title)
-
----
-
 <h2 id="license">🔏 License</h2>
 
-Copyright © 2023 mertushka & basro
-
-This project is licensed by [MIT License](https://api.github.com/licenses/mit).
+Copyright © This project is licensed by [MIT License](https://api.github.com/licenses/mit).
 
 [Back To The Top](#title)
