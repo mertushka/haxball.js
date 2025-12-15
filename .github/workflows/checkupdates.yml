@@ -1,4 +1,4 @@
-name: Weekly Update Check
+name: Haxball Headless Update Check
 
 on:
   schedule:
