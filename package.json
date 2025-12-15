@@ -22,7 +22,7 @@
   "dependencies": {
     "@mertushka/node-datachannel": "^0.35.0",
     "@peculiar/webcrypto": "^1.5.0",
-    "@types/haxball-headless-browser": "^0.4.0",
+    "@types/haxball-headless-browser": "^0.5.0",
     "https-proxy-agent": "^7.0.6",
     "json5": "^2.2.3",
     "pako": "^2.1.0",
