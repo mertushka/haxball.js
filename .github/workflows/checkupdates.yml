@@ -1,0 +1,204 @@
+name: Haxball Headless Update Check
+
+on:
+  schedule:
+    # Runs every Monday at 9:00 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch: # Allows manual triggering
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-check:
+    name: Build and Check for Updates
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.changes.outputs.has_changes }}
+      new_hash: ${{ steps.build.outputs.new_hash }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build with nodeify
+        id: build
+        run: |
+          OUTPUT=$(bun run build 2>&1)
+          echo "$OUTPUT"
+          NEW_HASH=$(echo "$OUTPUT" | grep -oP "SUCCESS:\K[a-f0-9]{8}" || echo "unknown")
+          echo "new_hash=$NEW_HASH" >> $GITHUB_OUTPUT
+          echo "Build completed with hash: $NEW_HASH"
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No changes detected after build"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Changes detected after build"
+            git diff --stat
+          fi
+
+      - name: Upload build artifacts
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-files
+          path: |
+            src/
+            bun.lockb
+          retention-days: 1
+
+  test:
+    name: Test on ${{ matrix.os }}
+    needs: build-and-check
+    if: needs.build-and-check.outputs.has_changes == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: built-files
+
+      - name: Type check
+        run: bun run type-check
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Run tests
+        run: bun run test
+        env:
+          TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
+
+  create-pr:
+    name: Create Pull Request
+    needs: [build-and-check, test]
+    if: needs.build-and-check.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: built-files
+
+      - name: Close old update PRs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open'
+            });
+
+            const updatePRs = pullRequests.filter(pr => 
+              pr.head.ref.startsWith('update-haxball-') &&
+              pr.labels.some(label => label.name === 'haxball-update')
+            );
+
+            for (const pr of updatePRs) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: '🔄 Closing this PR as a new Haxball update is available. See the latest update PR.'
+              });
+              
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                state: 'closed'
+              });
+              
+              console.log(`Closed old PR #${pr.number}: ${pr.title}`);
+            }
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: update haxball headless (hash: ${{ needs.build-and-check.outputs.new_hash }})'
+          branch: update-haxball-${{ needs.build-and-check.outputs.new_hash }}
+          delete-branch: true
+          title: 'Update Haxball Headless (hash: ${{ needs.build-and-check.outputs.new_hash }})'
+          body: |
+            ## Automated Haxball Update
+
+            This PR was automatically created by the weekly update check workflow.
+
+            **Build Hash:** `${{ needs.build-and-check.outputs.new_hash }}`
+            **Triggered:** ${{ github.event_name == 'schedule' && 'Weekly scheduled run' || 'Manual dispatch' }}
+
+            **Summary:**
+            The Haxball headless script has been rebuilt and changes were detected. All tests passed on ubuntu-latest, macos-latest, and windows-latest.
+
+            **Checklist:**
+            - [x] Tests pass on all platforms
+            - [ ] No breaking changes detected
+            - [ ] Documentation updated if needed
+
+            ---
+            *Auto-generated by Weekly Update Check workflow*
+          labels: |
+            automated
+            dependencies
+            haxball-update
+
+  no-changes:
+    name: Report No Changes
+    needs: build-and-check
+    if: needs.build-and-check.outputs.has_changes == 'false'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Log result
+        run: |
+          echo "✅ No updates found. Build hash: ${{ needs.build-and-check.outputs.new_hash }} - no changes detected."
