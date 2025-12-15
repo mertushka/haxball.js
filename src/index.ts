@@ -21,8 +21,6 @@ let promiseResolve: ((value: typeof HBInit) => void) | null = null;
 let proxyAgent: HttpsProxyAgent | undefined;
 let debug = false;
 
-//import "haxball-headless-browser";
-
  interface HaxballJSConfig {
   proxy?: string;
   debug?: boolean;
