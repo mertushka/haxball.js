@@ -6,14 +6,14 @@ import HaxballJS from '../src'
 test.todo('HBInit with custom webrtc', (done) => {
 	// TODO: Bun crashes because of "wrtc" module
 	HaxballJS({ debug: true }).then((HBInit) => {
-		expect(process.env.CI_HB_HEADLESS_TOKEN).toBeDefined()
+		expect(process.env.TEST_HB_HEADLESS_TOKEN).toBeDefined()
 
 		const room = HBInit({
 			roomName: 'Haxball.JS',
 			maxPlayers: 16,
 			public: false,
 			noPlayer: true,
-			token: process.env.CI_HB_HEADLESS_TOKEN,
+			token: process.env.TEST_HB_HEADLESS_TOKEN,
 		})
 
 		room.setDefaultStadium('Big')

@@ -6,7 +6,7 @@ test.todo('HBInit with proxy', (done) => {
 	// Run `bun test --todo` if testing locally
 	HaxballJS({ proxy: process.env.TEST_HB_PROXY, debug: true }).then(
 		(HBInit) => {
-			expect(process.env.CI_HB_HEADLESS_TOKEN).toBeDefined()
+			expect(process.env.TEST_HB_HEADLESS_TOKEN).toBeDefined()
 			expect(process.env.TEST_HB_PROXY).toBeDefined()
 
 			const room = HBInit({
@@ -14,7 +14,7 @@ test.todo('HBInit with proxy', (done) => {
 				maxPlayers: 16,
 				public: false,
 				noPlayer: true,
-				token: process.env.CI_HB_HEADLESS_TOKEN,
+				token: process.env.TEST_HB_HEADLESS_TOKEN,
 			})
 
 			room.setDefaultStadium('Big')

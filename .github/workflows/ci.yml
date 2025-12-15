@@ -39,3 +39,5 @@ jobs:
 
       - name: Run tests
         run: bun run test
+        env:
+          TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
