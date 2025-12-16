@@ -18,7 +18,7 @@
 	"scripts": {
 		"build": "bunup --format esm,cjs --minify --silent",
 		"dev": "bunup --watch",
-		"postinstall": "bun simple-git-hooks",
+		"prepare": "simple-git-hooks",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"release": "bumpp --commit --push --tag",
@@ -46,20 +46,20 @@
 		}
 	},
 	"type": "module",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
-			"import": {
-				"types": "./dist/index.d.ts",
-				"default": "./dist/index.js"
-			}
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs",
+			"types": "./dist/index.d.ts"
 		},
 		"./package.json": "./package.json"
 	},
-	"module": "./dist/index.js",
 	"simple-git-hooks": {
 		"pre-commit": "bun run lint && bun run type-check"
 	},
-	"types": "./dist/index.d.ts",
 	"dependencies": {
 		"@peculiar/webcrypto": "^1.5.0",
 		"@types/haxball-headless-browser": "^0.5.0",
