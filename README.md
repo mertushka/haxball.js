@@ -27,10 +27,22 @@
 npm install haxball.js
 ```
 
+#### CommonJS Module Usage Example
+
+```js
+const HaxballJS = require('haxball.js').default;
+```
+
+#### ESM Module Usage Example
+
+```js
+import HaxballJS from 'haxball.js';
+```
+
 #### Module Usage Example
 
 ```js
-const HaxballJS = require('haxball.js');
+import HaxballJS from 'haxball.js';
 
 HaxballJS().then((HBInit) => {
 	// Same as in Haxball Headless Host Documentation
@@ -91,16 +103,6 @@ Example:
 ```js
 HaxballJS({ proxy: "http://1.1.1.1:80", }).then((HBInit) => {...});
 
-```
-
-### 💻 TypeScript
-
-#### TypeScript Example
-
-```js
-import HaxballJS from 'haxball.js';
-
-HaxballJS().then((HBInit) => {...});
 ```
 
 #### 💻 Bun
