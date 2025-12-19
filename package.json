@@ -3,6 +3,12 @@
 	"version": "4.0.1",
 	"author": "mertushka",
 	"description": "A powerful library for interacting with the Haxball Headless API",
+	"keywords": [
+		"haxball",
+		"headless",
+		"bot",
+		"room"
+	],
 	"homepage": "https://github.com/mertushka/haxball.js#readme",
 	"bugs": {
 		"url": "https://github.com/mertushka/haxball.js/issues"
