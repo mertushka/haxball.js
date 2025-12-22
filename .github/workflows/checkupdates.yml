@@ -60,7 +60,7 @@ jobs:
           name: built-files
           path: |
             src/
-            bun.lockb
+            bun.lock
           retention-days: 1
 
   test:
