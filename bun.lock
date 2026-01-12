@@ -9,7 +9,7 @@
         "@types/haxball-headless-browser": "^0.5.0",
         "https-proxy-agent": "^7.0.6",
         "json5": "^2.2.3",
-        "node-datachannel": "^0.31.0",
+        "node-datachannel": "^0.32.0",
         "pako": "^2.1.0",
         "ws": "^8.18.3",
         "xhr2": "^0.2.1",
@@ -309,7 +309,7 @@
 
     "node-abi": ["node-abi@3.85.0", "", { "dependencies": { "semver": "^7.3.5" } }, "sha512-zsFhmbkAzwhTft6nd3VxcG0cvJsT70rL+BIGHWVq5fi6MwGrHwzqKaxXE+Hl2GmnGItnDKPPkO5/LQqjVkIdFg=="],
 
-    "node-datachannel": ["node-datachannel@0.31.0", "", { "dependencies": { "prebuild-install": "^7.1.3" } }, "sha512-Oc+5v4OB5lYW+WMFE085FH3h3T0J9pTLmQ/dh1t/+xAnkeD8X1YtHTkEEwil7R857rFzntTlwLCDlndfUyqvNQ=="],
+    "node-datachannel": ["node-datachannel@0.32.0", "", { "dependencies": { "prebuild-install": "^7.1.3" } }, "sha512-kohrPL3rOWfiD+oJgc9R7Ibx10U3/yJ+oQ/uB2W2d2B+y4B1bkAMPoONRVS3PTz7AHFqdvoEe5VoRDZ+I6xFEw=="],
 
     "node-fetch-native": ["node-fetch-native@1.6.7", "", {}, "sha512-g9yhqoedzIUm0nTnTqAQvueMPVOuIY16bqgAJJC8XOOubYFNwz6IER9qs0Gq2Xd0+CecCKFjtdDTMA4u4xG06Q=="],
 
