@@ -1,6 +1,6 @@
 {
 	"name": "haxball.js",
-	"version": "4.0.1",
+	"version": "4.0.2",
 	"author": "mertushka",
 	"description": "A powerful library for interacting with the Haxball Headless API",
 	"keywords": [
