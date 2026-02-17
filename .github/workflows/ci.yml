@@ -1,6 +1,6 @@
 name: CI
 
-on: [push, pull_request]
+on: [push]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -39,6 +39,5 @@ jobs:
 
       - name: Run tests
         run: bun run test
-        continue-on-error: ${{ github.event_name == 'pull_request' }}
         env:
           TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
