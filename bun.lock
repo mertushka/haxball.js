@@ -183,7 +183,7 @@
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.10.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg=="],
 
-    "@types/bun": ["@types/bun@1.3.6", "", { "dependencies": { "bun-types": "1.3.6" } }, "sha512-uWCv6FO/8LcpREhenN1d1b6fcspAB+cefwD7uti8C8VffIv0Um08TKMn98FynpTiU38+y2dUO55T11NgDt8VAA=="],
+    "@types/bun": ["@types/bun@1.3.9", "", { "dependencies": { "bun-types": "1.3.9" } }, "sha512-KQ571yULOdWJiMH+RIWIOZ7B2RXQGpL1YQrBtLIV3FqDcCu6FsbFUBwhdKUlCKUpS3PJDsHlJ1QKlpxoVR+xtw=="],
 
     "@types/haxball-headless-browser": ["@types/haxball-headless-browser@0.5.0", "", {}, "sha512-zc6/ULLqtRo5wkibWwI5qDYTxr9lBR/uUQb3GdA7LSPAutzvEzHpy1seyXrnjoAzy6O7AoCyzLN2/eoWcMIuuQ=="],
 
@@ -209,7 +209,7 @@
 
     "bumpp": ["bumpp@10.4.1", "", { "dependencies": { "ansis": "^4.2.0", "args-tokenizer": "^0.3.0", "c12": "^3.3.3", "cac": "^6.7.14", "escalade": "^3.2.0", "jsonc-parser": "^3.3.1", "package-manager-detector": "^1.6.0", "semver": "^7.7.3", "tinyexec": "^1.0.2", "tinyglobby": "^0.2.15", "yaml": "^2.8.2" }, "bin": { "bumpp": "bin/bumpp.mjs" } }, "sha512-X/bwWs5Gbb/D7rN4aHLB7zdjiA6nGdjckM1sTHhI9oovIbEw2L5pw5S4xzk8ZTeOZ8EnwU/Ze4SoZ6/Vr3pM2Q=="],
 
-    "bun-types": ["bun-types@1.3.6", "", { "dependencies": { "@types/node": "*" } }, "sha512-OlFwHcnNV99r//9v5IIOgQ9Uk37gZqrNMCcqEaExdkVq3Avwqok1bJFmvGMCkCE0FqzdY8VMOZpfpR3lwI+CsQ=="],
+    "bun-types": ["bun-types@1.3.9", "", { "dependencies": { "@types/node": "*" } }, "sha512-+UBWWOakIP4Tswh0Bt0QD0alpTY8cb5hvgiYeWCMet9YukHbzuruIEeXC2D7nMJPB12kbh8C7XJykSexEqGKJg=="],
 
     "bunup": ["bunup@0.16.20", "", { "dependencies": { "@bunup/dts": "^0.14.49", "@bunup/shared": "0.16.19", "chokidar": "^5.0.0", "coffi": "^0.1.37", "lightningcss": "^1.30.2", "picocolors": "^1.1.1", "tinyexec": "^1.0.2", "tree-kill": "^1.2.2", "zlye": "^0.4.4" }, "peerDependencies": { "typescript": "latest" }, "optionalPeers": ["typescript"], "bin": { "bunup": "dist/cli/index.js" } }, "sha512-a3Bu6ho8Bs7YEynHzUvwBVXXJIbSxlYMDYZrndyIIL1waUYQ4Eh9V62vS8TpVESOxcx8mQfuS5Hb1bXYE2bYkA=="],
 
