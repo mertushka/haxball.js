@@ -1,5 +1,5 @@
 {
-	"name": "haxball.js",
+	"name": "haxball-ping.js",
 	"version": "4.0.2",
 	"author": "mertushka",
 	"description": "A powerful library for interacting with the Haxball Headless API",

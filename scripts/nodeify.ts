@@ -115,6 +115,13 @@ function applyRegexReplacements(source: string): string {
 		'case "recaptcha":console.log(new Error("Invalid Token Provided!"))',
 	)
 
+	const pingHack =
+		'getPlayerPing:function(id){let p=D.wb.get(id);return p?Math.round(p.jc.li()):0;},'
+	source = source.replace(
+		'getPlayerList:function(){',
+		`${pingHack}getPlayerList:function(){`,
+	)
+
 	return source
 }
 
