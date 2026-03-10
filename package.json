@@ -24,7 +24,6 @@
 	"scripts": {
 		"build": "bunup --format esm,cjs --minify --silent",
 		"dev": "bunup --watch",
-		"prepare": "bun simple-git-hooks",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"release": "bumpp --commit --push --tag",
