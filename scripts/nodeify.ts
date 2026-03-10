@@ -116,7 +116,7 @@ function applyRegexReplacements(source: string): string {
 	)
 
 	const pingHack =
-		'getPlayerPing:function(id){let p=D.wb.get(id);return p?Math.round(p.jc.li()):0;},'
+		'getPlayerPing:function(id){let p=D.wb.get(id);return p?p.$c:0;},'
 	source = source.replace(
 		'getPlayerList:function(){',
 		`${pingHack}getPlayerList:function(){`,
