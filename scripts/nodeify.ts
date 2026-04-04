@@ -129,6 +129,8 @@ import { Crypto } from "@peculiar/webcrypto";
 import { performance } from "perf_hooks";
 import datachannel from "node-datachannel/polyfill";
 
+import type { HBInit } from "./types";
+
 const crypto = new Crypto();
 
 let {
