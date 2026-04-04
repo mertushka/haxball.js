@@ -126,7 +126,6 @@ bun index.ts
 - pako - ZLIB port for Node.JS
 - xhr2 - W3C XMLHttpRequest implementation for Node.JS
 - https-proxy-agent - Websocket Proxy Support
-- @types/haxball-headless-browser - Type definitions
 
 [Back To The Top](#title)
 
