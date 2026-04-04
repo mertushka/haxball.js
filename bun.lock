@@ -7,7 +7,7 @@
       "dependencies": {
         "@peculiar/webcrypto": "^1.5.0",
         "@types/haxball-headless-browser": "^0.5.0",
-        "https-proxy-agent": "^7.0.6",
+        "https-proxy-agent": "^8.0.0",
         "json5": "^2.2.3",
         "node-datachannel": "^0.32.0",
         "pako": "^2.1.0",
@@ -193,7 +193,7 @@
 
     "@types/ws": ["@types/ws@8.18.1", "", { "dependencies": { "@types/node": "*" } }, "sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg=="],
 
-    "agent-base": ["agent-base@7.1.4", "", {}, "sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ=="],
+    "agent-base": ["agent-base@8.0.0", "", {}, "sha512-QT8i0hCz6C/KQ+KTAbSNwCHDGdmUJl2tp2ZpNlGSWCfhUNVbYG2WLE3MdZGBAgXPV4GAvjGMxo+C1hroyxmZEg=="],
 
     "ansis": ["ansis@4.2.0", "", {}, "sha512-HqZ5rWlFjGiV0tDm3UxxgNRqsOTniqoKZu0pIAfh7TZQMGuZK+hH0drySty0si0QXj1ieop4+SkSfPZBPPkHig=="],
 
@@ -259,7 +259,7 @@
 
     "github-from-package": ["github-from-package@0.0.0", "", {}, "sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw=="],
 
-    "https-proxy-agent": ["https-proxy-agent@7.0.6", "", { "dependencies": { "agent-base": "^7.1.2", "debug": "4" } }, "sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw=="],
+    "https-proxy-agent": ["https-proxy-agent@8.0.0", "", { "dependencies": { "agent-base": "8.0.0", "debug": "^4.3.4" } }, "sha512-YYeW+iCnAS3xhvj2dvVoWgsbca3RfQy/IlaNHHOtDmU0jMqPI9euIq3Y9BJETdxk16h9NHHCKqp/KB9nIMStCQ=="],
 
     "ieee754": ["ieee754@1.2.1", "", {}, "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="],
 
