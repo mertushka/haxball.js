@@ -48,4 +48,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to npm
-        run: bun publish --access public
+        # Fallback to npm until bun fixes the issue https://github.com/oven-sh/bun/issues/24124
+        run: npm publish --access public
