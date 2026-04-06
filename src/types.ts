@@ -5,9 +5,9 @@
  * @example
  * ```js
  * var room = HBInit({
- *   roomName: "My room",
- *   maxPlayers: 16,
- *   noPlayer: true // Remove host player (recommended!)
+ * roomName: "My room",
+ * maxPlayers: 16,
+ * noPlayer: true // Remove host player (recommended!)
  * });
  * room.setDefaultStadium("Big");
  * room.setScoreLimit(5);
@@ -67,7 +67,7 @@ interface RoomObject {
 	 * @param playerId - The ID of the player.
 	 * @param team - The team ID (0 = Spectators, 1 = Red, 2 = Blue).
 	 */
-	setPlayerTeam(playerId: number, team: number): void
+	setPlayerTeam(playerId: number, team: TeamID): void
 
 	/**
 	 * Kicks the specified player from the room.
@@ -278,9 +278,9 @@ interface RoomObject {
 	/**
 	 * Same as getDiscProperties but targets the disc belonging to a player with the given Id.
 	 * @param playerId - The ID of the player.
-	 * @returns The player's disc properties.
+	 * @returns The player's disc properties (can be null if the player doesn't exist).
 	 */
-	getPlayerDiscProperties(playerId: number): DiscPropertiesObject
+	getPlayerDiscProperties(playerId: number): DiscPropertiesObject | null
 
 	/**
 	 * Gets the number of discs in the game including the ball and player discs.
@@ -399,17 +399,17 @@ interface RoomObject {
 
 	/**
 	 * Event called when the game is paused.
-	 * @param byPlayer - The player who paused the game.
+	 * @param byPlayer - The player who paused the game (can be null if not caused by a player).
 	 */
-	onGamePause(byPlayer: PlayerObject): void
+	onGamePause(byPlayer: PlayerObject | null): void
 
 	/**
 	 * Event called when the game is unpaused.
 	 * After this event there's a timer before the game is fully unpaused.
 	 * Listen for the first onGameTick event after this to detect when the game has really resumed.
-	 * @param byPlayer - The player who unpaused the game.
+	 * @param byPlayer - The player who unpaused the game (can be null if not caused by a player).
 	 */
-	onGameUnpause(byPlayer: PlayerObject): void
+	onGameUnpause(byPlayer: PlayerObject | null): void
 
 	/**
 	 * Event called when the players and ball positions are reset after a goal.
@@ -426,9 +426,9 @@ interface RoomObject {
 	/**
 	 * Event called when the stadium is changed.
 	 * @param newStadiumName - The name of the new stadium.
-	 * @param byPlayer - The player who changed the stadium.
+	 * @param byPlayer - The player who changed the stadium (can be null if not caused by a player).
 	 */
-	onStadiumChange(newStadiumName: string, byPlayer: PlayerObject): void
+	onStadiumChange(newStadiumName: string, byPlayer: PlayerObject | null): void
 
 	/**
 	 * Event called when the room link is obtained.
@@ -441,14 +441,21 @@ interface RoomObject {
 	 * @param min - The minimum frames between kicks.
 	 * @param rate - The rate parameter.
 	 * @param burst - The burst parameter.
-	 * @param byPlayer - The player who changed the setting.
+	 * @param byPlayer - The player who changed the setting (can be null if not caused by a player).
 	 */
 	onKickRateLimitSet(
 		min: number,
 		rate: number,
 		burst: number,
-		byPlayer: PlayerObject,
+		byPlayer: PlayerObject | null,
 	): void
+
+	/**
+	 * Event called when the teams lock setting is changed.
+	 * @param locked - Whether the teams are currently locked.
+	 * @param byPlayer - The player who changed the setting (can be null if not caused by a player).
+	 */
+	onTeamsLockChange(locked: boolean, byPlayer: PlayerObject | null): void
 }
 
 /**
@@ -581,7 +588,6 @@ interface CollisionFlagsObject {
  * Root object of a stadium file (.hbs).
  * A HaxBall stadium file is a text file with JSON5 format containing a single StadiumObject.
  */
-
 // biome-ignore lint/correctness/noUnusedVariables: This interface is used for type checking the stadium configuration object passed to setCustomStadium, but it isn't used directly in the code.
 interface StadiumObject {
 	/** The name of the stadium. */
@@ -622,7 +628,10 @@ interface StadiumObject {
 	 * Map of named traits. TraitValues define default values for any object that references that trait.
 	 * Useful for avoiding repetition when manually writing stadium files.
 	 */
-	traits?: Record<string, object>
+	traits?: Record<
+		string,
+		Partial<Vertex & Segment & Goal & Plane & Disc & Joint>
+	>
 	/** List of vertexes (collision points). */
 	vertexes?: Vertex[]
 	/** List of segments (lines connecting vertexes). */
@@ -641,13 +650,13 @@ interface StadiumObject {
 	 * When a player joins a started game, they're positioned at the last point.
 	 * Default: []
 	 */
-	redSpawnPoints?: number[][]
+	redSpawnPoints?: [number, number][]
 	/**
 	 * List of spawn points for blue team kickoff.
 	 * If empty, default spawn behavior is used.
 	 * Default: []
 	 */
-	blueSpawnPoints?: number[][]
+	blueSpawnPoints?: [number, number][]
 	/** Object describing player physics. If omitted, default player physics will be used. */
 	playerPhysics?: PlayerPhysics
 	/**
@@ -675,7 +684,7 @@ interface BackgroundObject {
 	/** Horizontal distance to goals from <0,0>, used by "hockey" background only. Default: 0 */
 	goalLine?: number
 	/** Background color for the stadium. Default: "718C5A" */
-	color?: string | number[]
+	color?: string | [number, number, number]
 }
 
 /**
@@ -725,7 +734,7 @@ interface Segment {
 	/** If false, the segment will be invisible. Default: true */
 	vis?: boolean
 	/** The color with which the segment will be drawn. Default: "000000" (black) */
-	color?: string | number[]
+	color?: string | [number, number, number]
 	/** A trait to use as default values for this object. See StadiumObject traits property for more info. */
 	trait?: string
 }
@@ -735,9 +744,9 @@ interface Segment {
  */
 interface Goal {
 	/** The coordinates of the first point of the line in array form [x, y]. */
-	p0?: number[]
+	p0?: [number, number]
 	/** The coordinates of the second point of the line in array form [x, y]. */
-	p1?: number[]
+	p1?: [number, number]
 	/** The team the goal belongs to: "red" or "blue". */
 	team?: 'red' | 'blue'
 	/** A trait to use as default values for this object. See StadiumObject traits property for more info. */
@@ -750,7 +759,7 @@ interface Goal {
  */
 interface Plane {
 	/** The direction vector of the plane in array form [x, y]. */
-	normal?: number[]
+	normal?: [number, number]
 	/** The distance from coordinates [0,0] (in direction of the normal) where the plane is located. */
 	dist?: number
 	/** The bouncing coefficient. */
@@ -768,11 +777,11 @@ interface Plane {
  */
 interface Disc {
 	/** The starting position of the object in array form [x, y]. */
-	pos?: number[]
+	pos?: [number, number]
 	/** The starting speed of the object in array form [x, y]. */
-	speed?: number[]
+	speed?: [number, number]
 	/** The gravity vector of the object in array form [x, y]. */
-	gravity?: number[]
+	gravity?: [number, number]
 	/** The radius of the disc. */
 	radius?: number
 	/** The inverse of the disc's mass. */
@@ -780,7 +789,7 @@ interface Disc {
 	/** The damping factor of the disc. */
 	damping?: number
 	/** The disc fill color. Supports "transparent". Default: "FFFFFF" */
-	color?: string | number[]
+	color?: string | [number, number, number]
 	/** The bouncing coefficient. */
 	bCoef?: number
 	/** List of flags representing this object's collision mask. */
@@ -796,7 +805,7 @@ interface Disc {
  */
 interface PlayerPhysics {
 	/** The gravity vector affecting players. */
-	gravity?: number[]
+	gravity?: [number, number]
 	/** The radius of the player disc. */
 	radius?: number
 	/** The inverse of the player's mass. */
@@ -849,7 +858,7 @@ interface Joint {
 	 */
 	strength?: number | 'rigid'
 	/** The color of the joint. Supports "transparent". Default: "000000" (black) */
-	color?: string | number[]
+	color?: string | [number, number, number]
 	/** A trait to use as default values for this object. See StadiumObject traits property for more info. */
 	trait?: string
 }
