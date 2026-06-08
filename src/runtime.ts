@@ -67,6 +67,7 @@ export interface HeadlessEnvironment {
 	performance: Performance
 	TextEncoder: typeof TextEncoder
 	createWindow(resolve: (value: typeof HBInit) => void): HeadlessWindow
+	dispose(): Promise<void>
 }
 
 function isRecaptchaResponse(response: unknown): boolean {
@@ -145,6 +146,7 @@ export function createHeadlessEnvironment(
 	const proxyAgent = config.proxy
 		? new HttpsProxyAgent(new URL(config.proxy))
 		: undefined
+	const webSockets = new Set<WebSocket>()
 
 	class HaxballWebSocket extends WebSocket {
 		constructor(address: string | URL) {
@@ -152,6 +154,8 @@ export function createHeadlessEnvironment(
 				agent: proxyAgent,
 				headers: { origin: 'https://html5.haxball.com' },
 			})
+			webSockets.add(this)
+			this.once('close', () => webSockets.delete(this))
 
 			if (config.debug) {
 				this.on('error', (error) => {
@@ -187,5 +191,30 @@ export function createHeadlessEnvironment(
 		performance: globalThis.performance,
 		TextEncoder,
 		createWindow,
+		dispose() {
+			return Promise.all(
+				[...webSockets].map(
+					(webSocket) =>
+						new Promise<void>((resolve) => {
+							if (webSocket.readyState === WebSocket.CLOSED) {
+								resolve()
+								return
+							}
+
+							const timeout = setTimeout(() => {
+								webSocket.terminate()
+								resolve()
+							}, 1_000)
+							timeout.unref()
+
+							webSocket.once('close', () => {
+								clearTimeout(timeout)
+								resolve()
+							})
+							webSocket.close()
+						}),
+				),
+			).then(() => undefined)
+		},
 	}
 }
