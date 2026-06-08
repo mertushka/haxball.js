@@ -20,7 +20,7 @@ export declare function HBInit(roomConfig: RoomConfigObject): RoomObject
  * Configuration object for initializing a Haxball room.
  * All properties are optional.
  */
-interface RoomConfigObject {
+export interface RoomConfigObject {
 	/** The name for the room. */
 	roomName?: string
 	/** The name for the host player. */
@@ -47,7 +47,7 @@ interface RoomConfigObject {
  * Main interface for controlling the room and listening to its events.
  * @note All API functions that modify the game's state execute asynchronously.
  */
-interface RoomObject {
+export interface RoomObject {
 	/**
 	 * Sends a chat message using the host player.
 	 * @param msg - The message to send.
@@ -461,7 +461,7 @@ interface RoomObject {
 /**
  * Holds information about a player.
  */
-interface PlayerObject {
+export interface PlayerObject {
 	/** The unique id of the player. Each player gets a unique id that will never change. */
 	id: number
 	/** The name of the player. */
@@ -474,7 +474,7 @@ interface PlayerObject {
 	position: { x: number; y: number } | null
 }
 
-interface PlayerJoinObject extends PlayerObject {
+export interface PlayerJoinObject extends PlayerObject {
 	/**
 	 * The player's public ID. Players can view their own ID at https://www.haxball.com/playerauth
 	 * Useful for validating a player is who they claim to be, but not for verifying they aren't someone else.
@@ -493,7 +493,7 @@ interface PlayerJoinObject extends PlayerObject {
 /**
  * Holds information relevant to the current game scores.
  */
-interface ScoresObject {
+export interface ScoresObject {
 	/** The number of goals scored by the red team. */
 	red: number
 	/** The number of goals scored by the blue team. */
@@ -512,12 +512,12 @@ interface ScoresObject {
  * - 1 = Red Team
  * - 2 = Blue Team
  */
-type TeamID = 0 | 1 | 2
+export type TeamID = 0 | 1 | 2
 
 /**
  * Holds information about a game physics disc.
  */
-interface DiscPropertiesObject {
+export interface DiscPropertiesObject {
 	/** The x coordinate of the disc's position. */
 	x: number
 	/** The y coordinate of the disc's position. */
@@ -555,7 +555,7 @@ interface DiscPropertiesObject {
  *
  * @see https://github.com/haxball/haxball-issues/wiki/Collision-Flags
  */
-interface CollisionFlagsObject {
+export interface CollisionFlagsObject {
 	/** Default collision group of the ball. */
 	ball: number
 	/** Automatically added to players of the red team. */
@@ -588,8 +588,7 @@ interface CollisionFlagsObject {
  * Root object of a stadium file (.hbs).
  * A HaxBall stadium file is a text file with JSON5 format containing a single StadiumObject.
  */
-// biome-ignore lint/correctness/noUnusedVariables: This interface is used for type checking the stadium configuration object passed to setCustomStadium, but it isn't used directly in the code.
-interface StadiumObject {
+export interface StadiumObject {
 	/** The name of the stadium. */
 	name?: string
 	/** Width of the rectangle centered at <0,0> in which the camera will be contained. */
@@ -670,7 +669,7 @@ interface StadiumObject {
 /**
  * Describes the background for the stadium.
  */
-interface BackgroundObject {
+export interface BackgroundObject {
 	/** Type of background: "grass", "hockey", or "none". Default: "none" */
 	type?: 'grass' | 'hockey' | 'none'
 	/** Width of the background rectangle. Default: 0 */
@@ -690,7 +689,7 @@ interface BackgroundObject {
 /**
  * A vertex is a point which can collide with discs but cannot move and is not visible.
  */
-interface Vertex {
+export interface Vertex {
 	/** The x position for the vertex. */
 	x?: number
 	/** The y position for the vertex. */
@@ -709,7 +708,7 @@ interface Vertex {
  * A segment is a line (curved or straight) that connects two vertexes.
  * Discs can collide with segments and they can also be used as decoration.
  */
-interface Segment {
+export interface Segment {
 	/** Index of a vertex in the stadium vertex list to be used as first point of the segment. */
 	v0?: number
 	/** Index of a vertex in the stadium vertex list to be used as the second point of the segment. */
@@ -742,7 +741,7 @@ interface Segment {
 /**
  * Goals are lines belonging to a team. When the ball crosses this line, the opposite team scores.
  */
-interface Goal {
+export interface Goal {
 	/** The coordinates of the first point of the line in array form [x, y]. */
 	p0?: [number, number]
 	/** The coordinates of the second point of the line in array form [x, y]. */
@@ -757,7 +756,7 @@ interface Goal {
  * Planes are collision objects that divide the map in two by an infinite line.
  * Useful for creating the boundaries of the stadium.
  */
-interface Plane {
+export interface Plane {
 	/** The direction vector of the plane in array form [x, y]. */
 	normal?: [number, number]
 	/** The distance from coordinates [0,0] (in direction of the normal) where the plane is located. */
@@ -775,7 +774,7 @@ interface Plane {
 /**
  * Discs are circular physical objects placed in the stadium. They can move and collide with other discs.
  */
-interface Disc {
+export interface Disc {
 	/** The starting position of the object in array form [x, y]. */
 	pos?: [number, number]
 	/** The starting speed of the object in array form [x, y]. */
@@ -803,7 +802,7 @@ interface Disc {
 /**
  * Describes physical constants affecting the players.
  */
-interface PlayerPhysics {
+export interface PlayerPhysics {
 	/** The gravity vector affecting players. */
 	gravity?: [number, number]
 	/** The radius of the player disc. */
@@ -831,7 +830,7 @@ interface PlayerPhysics {
 /**
  * Joints are physical connections between two discs.
  */
-interface Joint {
+export interface Joint {
 	/**
 	 * Index of one of the two discs connected by the joint.
 	 * Note: Index 0 is used by the ball disc if StadiumObject.ballPhysics is not set to "disc0".

@@ -1,29 +1,39 @@
-import { expect, test } from 'bun:test'
-import HaxballJS from '../src'
+import assert from 'node:assert/strict'
+import test from 'node:test'
 
-test.todo('HBInit with proxy', (done) => {
-	// TODO: Needs residential proxy for CI
-	// Run `bun test --todo` if testing locally
-	HaxballJS({ proxy: process.env.TEST_HB_PROXY, debug: true }).then(
-		(HBInit) => {
-			expect(process.env.TEST_HB_HEADLESS_TOKEN).toBeDefined()
-			expect(process.env.TEST_HB_PROXY).toBeDefined()
+import HaxballJS from '../src/index.ts'
 
-			const room = HBInit({
-				roomName: 'Haxball.JS',
-				maxPlayers: 16,
-				public: false,
-				noPlayer: true,
-				token: process.env.TEST_HB_HEADLESS_TOKEN,
-			})
+const token = process.env.TEST_HB_HEADLESS_TOKEN
+const proxy = process.env.TEST_HB_PROXY
 
-			room.setDefaultStadium('Big')
-			room.setScoreLimit(5)
-			room.setTimeLimit(0)
+test('creates a Haxball room through a proxy', {
+	skip:
+		token && proxy
+			? false
+			: 'TEST_HB_HEADLESS_TOKEN and TEST_HB_PROXY are required',
+	timeout: 30_000,
+}, async () => {
+	assert.ok(token)
+	assert.ok(proxy)
+	const HBInit = await HaxballJS({ proxy, debug: true })
 
-			room.onRoomLink = () => {
-				done()
-			}
-		},
-	)
+	await new Promise<void>((resolve, reject) => {
+		const timeout = setTimeout(
+			() => reject(new Error('Timed out waiting for the proxied room link')),
+			25_000,
+		)
+
+		const room = HBInit({
+			roomName: 'Haxball.JS',
+			maxPlayers: 16,
+			public: false,
+			noPlayer: true,
+			token,
+		})
+
+		room.onRoomLink = () => {
+			clearTimeout(timeout)
+			resolve()
+		}
+	})
 })

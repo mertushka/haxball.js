@@ -1,12 +1,16 @@
 {
 	"compilerOptions": {
-		"target": "ES2023",
-		"module": "Preserve",
+		"target": "ES2024",
+		"lib": ["ES2024", "DOM"],
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
 		"moduleDetection": "force",
+		"types": ["node"],
 
-		"moduleResolution": "bundler",
 		"allowImportingTsExtensions": true,
+		"rewriteRelativeImportExtensions": true,
 		"verbatimModuleSyntax": true,
+		"erasableSyntaxOnly": true,
 		"noEmit": true,
 
 		"strict": true,
@@ -23,6 +27,11 @@
 		"noPropertyAccessFromIndexSignature": false
 	},
 
-	"include": ["src/**/*"],
-	"exclude": ["node_modules", "dist", "bunup.config.ts"]
+	"include": [
+		"src/**/*.ts",
+		"scripts/**/*.ts",
+		"test/**/*.ts",
+		"tsdown.config.ts"
+	],
+	"exclude": ["node_modules", "dist"]
 }

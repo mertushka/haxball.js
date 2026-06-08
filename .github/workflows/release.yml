@@ -6,47 +6,111 @@ on:
       - 'v*'
 
 permissions:
-  contents: write
-  id-token: write
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  release:
-    name: Release Package
+  verify:
+    name: Verify Release
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      version: ${{ steps.package.outputs.version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          bun-version: latest
+          node-version: 24.x
+          cache: npm
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Build
-        run: bun run build
-
-      - name: Type check
-        run: bun run type-check
+        run: npm ci
 
       - name: Lint
-        run: bun run lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Build
+        run: npm run build
 
       - name: Run tests
-        run: bun run test
+        run: npm test
         env:
           TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
 
-      - name: Generate changelog
-        run: bunx changelogithub
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pack release
+        id: package
+        shell: bash
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if [[ "$GITHUB_REF_NAME" != "v$VERSION" ]]; then
+            echo "Tag $GITHUB_REF_NAME does not match package version $VERSION" >&2
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          mkdir -p package
+          npm pack --pack-destination package
+
+      - name: Upload release package
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-package
+          path: package/*.tgz
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish Release
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: npm
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Download release package
+        uses: actions/download-artifact@v8
+        with:
+          name: release-package
+          path: package
 
       - name: Publish to npm
-        # Fallback to npm until bun fixes the issue https://github.com/oven-sh/bun/issues/24124
-        run: npm publish --access public
+        shell: bash
+        env:
+          PACKAGE_VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          if npm view "haxball.js@$PACKAGE_VERSION" version >/dev/null 2>&1; then
+            echo "haxball.js@$PACKAGE_VERSION is already published"
+          else
+            npm publish package/*.tgz --access public --provenance
+          fi
+
+      - name: Create GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" package/*.tgz --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" package/*.tgz --generate-notes --verify-tag
+          fi

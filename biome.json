@@ -1,7 +1,7 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
 	"files": {
-		"includes": ["**", "!!**/src/index.ts"]
+		"includes": ["**", "!!**/src/generated/headless.ts"]
 	},
 	"assist": {
 		"enabled": true,
