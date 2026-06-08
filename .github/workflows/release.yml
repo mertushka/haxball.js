@@ -4,123 +4,27 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: Existing release tag to verify and publish
-        required: true
-        type: string
 
 permissions:
-  contents: read
-
-env:
-  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+  contents: write
+  id-token: write
 
 concurrency:
   group: haxball-room-token
   cancel-in-progress: false
 
 jobs:
-  verify:
-    name: Verify Release
+  release:
+    name: Release
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    outputs:
-      version: ${{ steps.package.outputs.version }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-          ref: ${{ env.RELEASE_TAG }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22.18.0
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Type check
-        run: npm run type-check
-
-      - name: Build
-        run: npm run build
-
-      - name: Validate package entrypoints
-        run: |
-          node -e "const pkg = require('./dist/index.cjs'); if (typeof pkg.default !== 'function') throw new Error('Invalid CommonJS entrypoint')"
-          node --input-type=module -e "import HaxballJS from './dist/index.mjs'; if (typeof HaxballJS !== 'function') throw new Error('Invalid ESM entrypoint')"
-
-      - name: Pack release
-        id: package
-        shell: bash
-        run: |
-          VERSION="$(node -p "require('./package.json').version")"
-          if [[ "$RELEASE_TAG" != "v$VERSION" ]]; then
-            echo "Tag $RELEASE_TAG does not match package version $VERSION" >&2
-            exit 1
-          fi
-
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          mkdir -p package
-          npm pack --pack-destination package
-
-      - name: Upload release package
-        uses: actions/upload-artifact@v7
-        with:
-          name: release-package
-          path: package/*.tgz
-          if-no-files-found: error
-          retention-days: 7
-
-  test:
-    name: Test Release
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-          ref: ${{ env.RELEASE_TAG }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22.18.0
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Require room token
-        run: node -e "if (!process.env.TEST_HB_HEADLESS_TOKEN) throw new Error('HEADLESS_TEST_TOKEN is not configured')"
-        env:
-          TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
-
-      - name: Run tests
-        run: npm test
-        env:
-          TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
-          TEST_HB_PROXY: ${{ secrets.HEADLESS_TEST_PROXY }}
-
-  publish:
-    name: Publish Release
-    needs: [verify, test]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     environment: npm
-    permissions:
-      contents: write
-      id-token: write
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
@@ -128,39 +32,45 @@ jobs:
           registry-url: https://registry.npmjs.org
           package-manager-cache: false
 
-      - name: Download release package
-        uses: actions/download-artifact@v8
-        with:
-          name: release-package
-          path: package
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Publish to npm
+      - name: Verify tag
         shell: bash
-        env:
-          PACKAGE_VERSION: ${{ needs.verify.outputs.version }}
         run: |
-          PACKAGE_FILE="./package/haxball.js-$PACKAGE_VERSION.tgz"
-          if [[ ! -f "$PACKAGE_FILE" ]]; then
-            echo "Release package not found: $PACKAGE_FILE" >&2
-            find ./package -maxdepth 2 -type f -print >&2
+          VERSION="$(node -p "require('./package.json').version")"
+          if [[ "$GITHUB_REF_NAME" != "v$VERSION" ]]; then
+            echo "Tag $GITHUB_REF_NAME does not match package version $VERSION" >&2
             exit 1
           fi
 
-          if npm view "haxball.js@$PACKAGE_VERSION" version >/dev/null 2>&1; then
-            echo "haxball.js@$PACKAGE_VERSION is already published"
-          else
-            npm publish "$PACKAGE_FILE" --access public --provenance
-          fi
+      - name: Verify package
+        run: |
+          npm run lint
+          npm run type-check
+          npm run build
+          node -e "const pkg = require('./dist/index.cjs'); if (typeof pkg.default !== 'function') throw new Error('Invalid CommonJS entrypoint')"
+          node --input-type=module -e "import HaxballJS from './dist/index.mjs'; if (typeof HaxballJS !== 'function') throw new Error('Invalid ESM entrypoint')"
 
-      - name: Create GitHub release
+      - name: Run tests
+        shell: bash
+        env:
+          TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
+          TEST_HB_PROXY: ${{ secrets.HEADLESS_TEST_PROXY }}
+        run: |
+          if [[ -z "$TEST_HB_HEADLESS_TOKEN" ]]; then
+            echo "HEADLESS_TEST_TOKEN is not configured" >&2
+            exit 1
+          fi
+          npm test
+
+      - name: Publish release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          PACKAGE_VERSION: ${{ needs.verify.outputs.version }}
         run: |
-          PACKAGE_FILE="./package/haxball.js-$PACKAGE_VERSION.tgz"
-          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" "$PACKAGE_FILE" --clobber
-          else
-            gh release create "$RELEASE_TAG" "$PACKAGE_FILE" --generate-notes --verify-tag
-          fi
+          VERSION="$(node -p "require('./package.json').version")"
+          PACKAGE_FILE="haxball.js-$VERSION.tgz"
+          npm pack
+          npm publish "./$PACKAGE_FILE" --access public --provenance
+          gh release create "$GITHUB_REF_NAME" "./$PACKAGE_FILE" --generate-notes --verify-tag
