@@ -71,5 +71,11 @@ jobs:
           VERSION="$(node -p "require('./package.json').version")"
           PACKAGE_FILE="haxball.js-$VERSION.tgz"
           npm pack
-          npm publish "./$PACKAGE_FILE" --access public --provenance
-          gh release create "$GITHUB_REF_NAME" "./$PACKAGE_FILE" --generate-notes --verify-tag
+          if [[ "$(npm view "haxball.js@$VERSION" version 2>/dev/null)" != "$VERSION" ]]; then
+            npm publish "./$PACKAGE_FILE" --access public --provenance
+          fi
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "./$PACKAGE_FILE" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "./$PACKAGE_FILE" --generate-notes --verify-tag
+          fi
