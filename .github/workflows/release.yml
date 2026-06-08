@@ -28,7 +28,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24.x
+          node-version: 22.18.0
           cache: npm
 
       - name: Install dependencies
@@ -42,11 +42,6 @@ jobs:
 
       - name: Build
         run: npm run build
-
-      - name: Run tests
-        run: npm test
-        env:
-          TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
 
       - name: Pack release
         id: package
@@ -70,9 +65,42 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  test:
+    name: Test Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: haxball-room-token
+      cancel-in-progress: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22.18.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Require room token
+        run: node -e "if (!process.env.TEST_HB_HEADLESS_TOKEN) throw new Error('HEADLESS_TEST_TOKEN is not configured')"
+        env:
+          TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
+
+      - name: Run tests
+        run: npm test
+        env:
+          TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
+          TEST_HB_PROXY: ${{ secrets.HEADLESS_TEST_PROXY }}
+
   publish:
     name: Publish Release
-    needs: verify
+    needs: [verify, test]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: npm

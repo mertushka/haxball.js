@@ -6,8 +6,8 @@ Thank you for your interest in contributing to our project! This guide will help
 
 ### Prerequisites
 
-- Node.js 24.12 or newer
-- npm 11 or newer
+- Node.js 22.18 or newer
+- npm 10.9.3 (bundled with Node.js 22.18)
 
 ### Getting Started
 

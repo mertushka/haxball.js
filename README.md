@@ -88,10 +88,20 @@ Haxball.JS uses `@mertushka/webrtc-node` as the default WebRTC library. However,
 Example:
 
 ```js
-const HaxballJS = require('haxball.js').default;
-const WebRTC = require('webrtc');
+import HaxballJS from 'haxball.js';
+import {
+	RTCPeerConnection,
+	RTCIceCandidate,
+	RTCSessionDescription,
+} from './custom-webrtc.js';
 
-HaxballJS({ webrtc: WebRTC }).then((HBInit) => {...});
+HaxballJS({
+	webrtc: {
+		RTCPeerConnection,
+		RTCIceCandidate,
+		RTCSessionDescription,
+	},
+}).then((HBInit) => {...});
 ```
 
 #### (Optional) Proxy
@@ -124,7 +134,7 @@ HaxballJS({ proxy: "http://1.1.1.1:80", }).then((HBInit) => {...});
 <h2 id="minimal-requirements">🌱 Minimal Requirements</h2>
 
 - npm
-- Node.js Version >=24.12
+- Node.js Version >=22.18
 
 [Back To The Top](#title)
 

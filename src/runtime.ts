@@ -10,6 +10,8 @@ import type { HBInit } from './types.ts'
 
 type Constructor = new (...args: never[]) => object
 
+export type WebRTCConstructor = Constructor
+
 interface HeadlessElement {
 	hidden?: boolean
 	innerHTML?: string
@@ -35,9 +37,9 @@ export interface HeadlessWindow {
 }
 
 export interface WebRTCImplementation {
-	RTCPeerConnection: typeof WebRTCNode.RTCPeerConnection
-	RTCIceCandidate: typeof WebRTCNode.RTCIceCandidate
-	RTCSessionDescription: typeof WebRTCNode.RTCSessionDescription
+	RTCPeerConnection: WebRTCConstructor
+	RTCIceCandidate: WebRTCConstructor
+	RTCSessionDescription: WebRTCConstructor
 }
 
 export interface HaxballJSConfig {
@@ -60,9 +62,9 @@ export interface HeadlessEnvironment {
 	XMLHttpRequest: Constructor
 	JSON5: typeof JSON5
 	pako: typeof pako
-	RTCPeerConnection: WebRTCImplementation['RTCPeerConnection']
-	RTCIceCandidate: WebRTCImplementation['RTCIceCandidate']
-	RTCSessionDescription: WebRTCImplementation['RTCSessionDescription']
+	RTCPeerConnection: WebRTCConstructor
+	RTCIceCandidate: WebRTCConstructor
+	RTCSessionDescription: WebRTCConstructor
 	crypto: Crypto
 	performance: Performance
 	TextEncoder: typeof TextEncoder

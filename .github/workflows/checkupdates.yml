@@ -30,7 +30,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24.x
+          node-version: 22.18.0
           cache: npm
 
       - name: Install dependencies
@@ -77,7 +77,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24.x
+          node-version: 22.18.0
           cache: npm
 
       - name: Install dependencies
@@ -107,8 +107,12 @@ jobs:
     if: needs.update-and-check.outputs.has_changes == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
+    concurrency:
+      group: haxball-room-token
+      cancel-in-progress: false
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         os: [ubuntu-latest, macos-15, windows-latest]
     steps:
@@ -120,7 +124,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24.x
+          node-version: 22.18.0
           cache: npm
 
       - name: Install dependencies
@@ -132,10 +136,16 @@ jobs:
           name: generated-headless
           path: src/generated
 
+      - name: Require room token
+        run: node -e "if (!process.env.TEST_HB_HEADLESS_TOKEN) throw new Error('HEADLESS_TEST_TOKEN is not configured')"
+        env:
+          TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
+
       - name: Run tests
         run: npm test
         env:
           TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
+          TEST_HB_PROXY: ${{ secrets.HEADLESS_TEST_PROXY }}
 
   create-pr:
     name: Create Pull Request
