@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: haxball-room-token
   cancel-in-progress: false
 
 jobs:
@@ -43,6 +43,11 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Validate package entrypoints
+        run: |
+          node -e "const pkg = require('./dist/index.cjs'); if (typeof pkg.default !== 'function') throw new Error('Invalid CommonJS entrypoint')"
+          node --input-type=module -e "import HaxballJS from './dist/index.mjs'; if (typeof HaxballJS !== 'function') throw new Error('Invalid ESM entrypoint')"
+
       - name: Pack release
         id: package
         shell: bash
@@ -69,9 +74,6 @@ jobs:
     name: Test Release
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    concurrency:
-      group: haxball-room-token
-      cancel-in-progress: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -111,7 +113,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24.x
+          node-version: 22.18.0
           registry-url: https://registry.npmjs.org
           package-manager-cache: false
 

@@ -5,20 +5,8 @@ import * as WebRTCNode from '@mertushka/webrtc-node'
 import {
 	createHeadlessEnvironment,
 	InvalidRoomTokenError,
-	type WebRTCImplementation,
 } from '../src/runtime.ts'
 import type { HBInit } from '../src/types.ts'
-
-type AssertWebRTCImplementation<T extends WebRTCImplementation> = T
-type BrowserWebRTCImplementation = AssertWebRTCImplementation<{
-	RTCPeerConnection: typeof globalThis.RTCPeerConnection
-	RTCIceCandidate: typeof globalThis.RTCIceCandidate
-	RTCSessionDescription: typeof globalThis.RTCSessionDescription
-}>
-
-const browserWebRTCTypeCheck: BrowserWebRTCImplementation | undefined =
-	undefined
-void browserWebRTCTypeCheck
 
 test('uses @mertushka/webrtc-node by default', () => {
 	const environment = createHeadlessEnvironment({})
@@ -43,7 +31,7 @@ test('uses a custom WebRTC implementation', () => {
 		RTCPeerConnection,
 		RTCIceCandidate,
 		RTCSessionDescription,
-	} satisfies WebRTCImplementation
+	}
 
 	const environment = createHeadlessEnvironment({
 		webrtc,

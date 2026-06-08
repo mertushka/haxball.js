@@ -12,6 +12,70 @@ import { createHeadlessEnvironment } from '../src/runtime.ts'
 const token = process.env.TEST_HB_HEADLESS_TOKEN
 const proxy = process.env.TEST_HB_PROXY
 
+test('does not proxy XMLHttpRequest connections', async (t) => {
+	let targetRequests = 0
+	const targetServer = createServer((_request, response) => {
+		targetRequests++
+		response.writeHead(200, { 'content-type': 'application/json' })
+		response.end('{"ok":true}')
+	})
+	targetServer.listen(0, '127.0.0.1')
+	await once(targetServer, 'listening')
+
+	let proxyRequests = 0
+	const proxyServer = createServer((_request, response) => {
+		proxyRequests++
+		response.writeHead(502)
+		response.end()
+	})
+	proxyServer.on('connect', (_request, clientSocket) => {
+		proxyRequests++
+		clientSocket.destroy()
+	})
+	proxyServer.listen(0, '127.0.0.1')
+	await once(proxyServer, 'listening')
+
+	t.after(async () => {
+		await Promise.all([
+			new Promise<void>((resolve, reject) =>
+				targetServer.close((error) => (error ? reject(error) : resolve())),
+			),
+			new Promise<void>((resolve, reject) =>
+				proxyServer.close((error) => (error ? reject(error) : resolve())),
+			),
+		])
+	})
+
+	const targetAddress = targetServer.address()
+	const proxyAddress = proxyServer.address()
+	assert.ok(targetAddress && typeof targetAddress !== 'string')
+	assert.ok(proxyAddress && typeof proxyAddress !== 'string')
+
+	const environment = createHeadlessEnvironment({
+		proxy: `http://127.0.0.1:${proxyAddress.port}`,
+	})
+	const DirectXMLHttpRequest =
+		environment.XMLHttpRequest as unknown as new () => {
+			status: number
+			onload: (() => void) | null
+			onerror: ((error: unknown) => void) | null
+			open(method: string, url: string): void
+			send(): void
+		}
+	const request = new DirectXMLHttpRequest()
+
+	await new Promise<void>((resolve, reject) => {
+		request.onload = () => resolve()
+		request.onerror = reject
+		request.open('GET', `http://127.0.0.1:${targetAddress.port}`)
+		request.send()
+	})
+
+	assert.equal(request.status, 200)
+	assert.equal(targetRequests, 1)
+	assert.equal(proxyRequests, 0)
+})
+
 test('routes WebSocket connections through the configured proxy', async (t) => {
 	const targetServer = createServer()
 	const webSocketServer = new WebSocketServer({ server: targetServer })
@@ -66,7 +130,7 @@ test('routes WebSocket connections through the configured proxy', async (t) => {
 	await once(socket, 'close')
 })
 
-test('creates a Haxball room through a proxy', {
+test('creates a Haxball room with a proxied WebSocket connection', {
 	skip:
 		token && proxy
 			? false

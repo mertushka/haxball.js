@@ -10,8 +10,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: haxball-room-token
+  cancel-in-progress: false
 
 jobs:
   update-and-check:
@@ -98,6 +98,11 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Validate package entrypoints
+        run: |
+          node -e "const pkg = require('./dist/index.cjs'); if (typeof pkg.default !== 'function') throw new Error('Invalid CommonJS entrypoint')"
+          node --input-type=module -e "import HaxballJS from './dist/index.mjs'; if (typeof HaxballJS !== 'function') throw new Error('Invalid ESM entrypoint')"
+
       - name: Validate package
         run: npm pack --dry-run
 
@@ -107,9 +112,6 @@ jobs:
     if: needs.update-and-check.outputs.has_changes == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
-    concurrency:
-      group: haxball-room-token
-      cancel-in-progress: false
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -155,6 +157,7 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+      issues: write
       pull-requests: write
     steps:
       - name: Checkout code
@@ -169,41 +172,8 @@ jobs:
           path: src/generated
 
       # A PAT or GitHub App token allows the created PR to trigger CI.
-      - name: Close old update PRs
-        uses: actions/github-script@v9
-        with:
-          github-token: ${{ secrets.UPDATE_PR_TOKEN || github.token }}
-          script: |
-            const { data: pullRequests } = await github.rest.pulls.list({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open'
-            });
-
-            const updatePRs = pullRequests.filter(pr =>
-              pr.head.ref.startsWith('update-haxball-') &&
-              pr.labels.some(label => label.name === 'haxball-update')
-            );
-
-            for (const pr of updatePRs) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: pr.number,
-                body: 'Closing this PR because a newer Haxball update is available.'
-              });
-
-              await github.rest.pulls.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-                state: 'closed'
-              });
-
-              console.log(`Closed old PR #${pr.number}: ${pr.title}`);
-            }
-
       - name: Create Pull Request
+        id: create-pr
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.UPDATE_PR_TOKEN || github.token }}
@@ -234,6 +204,45 @@ jobs:
             automated
             dependencies
             haxball-update
+
+      - name: Close old update PRs
+        uses: actions/github-script@v9
+        env:
+          CURRENT_PULL_REQUEST: ${{ steps.create-pr.outputs.pull-request-number }}
+        with:
+          github-token: ${{ secrets.UPDATE_PR_TOKEN || github.token }}
+          script: |
+            const currentPullRequest = Number(process.env.CURRENT_PULL_REQUEST || 0);
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+
+            const updatePRs = pullRequests.filter(pr =>
+              pr.number !== currentPullRequest &&
+              pr.head.ref.startsWith('update-haxball-') &&
+              (pr.labels ?? []).some(label => label.name === 'haxball-update')
+            );
+
+            for (const pr of updatePRs) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: 'Closing this PR because a newer Haxball update is available.'
+              });
+
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                state: 'closed'
+              });
+
+              console.log(`Closed old PR #${pr.number}: ${pr.title}`);
+            }
 
   no-changes:
     name: Report No Changes

@@ -25,7 +25,6 @@
 	"engines": {
 		"node": ">=22.18.0"
 	},
-	"packageManager": "npm@10.9.3",
 	"scripts": {
 		"build": "tsdown",
 		"dev": "tsdown --watch",
@@ -33,9 +32,9 @@
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"update:headless": "node scripts/update-headless.ts",
-		"test": "node --env-file-if-exists=.env --test --test-force-exit",
-		"test:coverage": "node --env-file-if-exists=.env --test --test-force-exit --experimental-test-coverage --test-coverage-exclude=src/generated/**",
-		"test:watch": "node --env-file-if-exists=.env --test --watch",
+		"test": "node --import ./scripts/load-env.ts --test --test-force-exit",
+		"test:coverage": "node --import ./scripts/load-env.ts --test --test-force-exit --experimental-test-coverage --test-coverage-exclude=src/generated/**",
+		"test:watch": "node --import ./scripts/load-env.ts --test --watch",
 		"type-check": "tsc --noEmit"
 	},
 	"devDependencies": {
