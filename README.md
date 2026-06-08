@@ -1,6 +1,6 @@
 [![NPM Version](https://img.shields.io/npm/v/haxball.js.svg?style=flat-square)](https://www.npmjs.com/package/haxball.js) [![NPM Monthly Downloads](https://img.shields.io/npm/dm/haxball.js.svg?style=flat-square)](https://npmjs.org/package/haxball.js)
 
-[![License](https://img.shields.io/github/license/mertushka/haxball.js?style=flat-square)](LICENSE.md) [![Last Commit](https://img.shields.io/github/last-commit/mertushka/haxball.js?style=flat-square)](https://github.com/mertushka/haxball.js/commits/) ![Language Most Used](https://img.shields.io/github/languages/top/mertushka/haxball.js?style=flat-square) [![Implementations](https://img.shields.io/badge/%F0%9F%92%A1-implementations-8C8E93.svg?style=flat-square)](https://github.com/mertushka/haxball.js/issues) ![Repository Size](https://img.shields.io/github/repo-size/mertushka/haxball.js?style=flat-square)
+[![License](https://img.shields.io/github/license/mertushka/haxball.js?style=flat-square)](LICENSE) [![Last Commit](https://img.shields.io/github/last-commit/mertushka/haxball.js?style=flat-square)](https://github.com/mertushka/haxball.js/commits/) ![Language Most Used](https://img.shields.io/github/languages/top/mertushka/haxball.js?style=flat-square) [![Implementations](https://img.shields.io/badge/%F0%9F%92%A1-implementations-8C8E93.svg?style=flat-square)](https://github.com/mertushka/haxball.js/issues) ![Repository Size](https://img.shields.io/github/repo-size/mertushka/haxball.js?style=flat-square)
 
 [![Forks](https://img.shields.io/github/forks/mertushka/haxball.js?style=social)](https://github.com/mertushka/haxball.js/network/members) [![Stars](https://img.shields.io/github/stars/mertushka/haxball.js?style=social)](https://github.com/mertushka/haxball.js/stargazers) [![Watches](https://img.shields.io/github/watchers/mertushka/haxball.js?style=social)](https://github.com/mertushka/haxball.js/watchers)
 
@@ -83,12 +83,12 @@ HaxballJS().then((HBInit) => {
 
 #### (Optional) Custom WebRTC Library
 
-Haxball.JS uses `node-datachannel` as the default WebRTC library. However, you can use a custom WebRTC implementation by specifying it in the HaxballJS config using the `webrtc` option.
+Haxball.JS uses `@mertushka/webrtc-node` as the default WebRTC library. However, you can use a custom WebRTC implementation by specifying it in the HaxballJS config using the `webrtc` option.
 
 Example:
 
 ```js
-const HaxballJS = require('haxball.js');
+const HaxballJS = require('haxball.js').default;
 const WebRTC = require('webrtc');
 
 HaxballJS({ webrtc: WebRTC }).then((HBInit) => {...});
@@ -105,24 +105,14 @@ HaxballJS({ proxy: "http://1.1.1.1:80", }).then((HBInit) => {...});
 
 ```
 
-#### 💻 Bun
-
-It's highly experimental and risky to use it in a production environment, but `haxball.js` is compatible with [Bun.JS](https://bun.sh/).
-
-```bash
-bun install haxball.js
-bun pm trust node-datachannel
-bun index.ts
-```
-
 ---
 
 <h2 id="technologies">🚀 Technologies</h2>
 
-- node-datachannel - WebRTC implementation for Node.JS
+- @mertushka/webrtc-node - WebRTC implementation for Node.JS
 - ws - Websocket Connection
 - json5 - JSON Helper Module
-- @peculiar/webcrypto - WebCrypto implementation for Node.JS
+- Node.js Web Crypto API - WebCrypto implementation
 - pako - ZLIB port for Node.JS
 - xhr2 - W3C XMLHttpRequest implementation for Node.JS
 - https-proxy-agent - Websocket Proxy Support
@@ -133,8 +123,8 @@ bun index.ts
 
 <h2 id="minimal-requirements">🌱 Minimal Requirements</h2>
 
-- NPM
-- NodeJS Version >=18
+- npm
+- Node.js Version >=24.12
 
 [Back To The Top](#title)
 

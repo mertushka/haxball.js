@@ -6,23 +6,24 @@ Thank you for your interest in contributing to our project! This guide will help
 
 ### Prerequisites
 
-- Bun installed on your system
+- Node.js 24.12 or newer
+- npm 11 or newer
 
 ### Getting Started
 
 1. Fork the repository
 2. Clone your fork: `git clone https://github.com/mertushka/haxball.js.git`
 3. Navigate to the project directory: `cd haxball.js`
-4. Install dependencies: `bun install`
-5. Start development: `bun run dev`
+4. Install dependencies: `npm install`
+5. Start development: `npm run dev`
 
 ## Development Workflow
 
 1. Create a new branch: `git checkout -b feature/your-feature-name`
 2. Make your changes
-3. Check and fix code style and formatting issues: `bun run lint:fix`
-4. Run tests: `bun run test`
-5. Build the project: `bun run build`
+3. Check and fix code style and formatting issues: `npm run lint:fix`
+4. Run tests: `npm test`
+5. Build the project: `npm run build`
 6. Commit your changes using the conventions below
 7. Push your branch to your fork
 8. Open a pull request
