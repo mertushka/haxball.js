@@ -79,4 +79,3 @@ jobs:
         run: npm test
         env:
           TEST_HB_HEADLESS_TOKEN: ${{ github.event_name == 'push' && secrets.HEADLESS_TEST_TOKEN || '' }}
-          TEST_HB_PROXY: ${{ github.event_name == 'push' && secrets.HEADLESS_TEST_PROXY || '' }}

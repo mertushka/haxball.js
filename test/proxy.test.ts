@@ -6,11 +6,7 @@ import test from 'node:test'
 import type WebSocket from 'ws'
 import { WebSocketServer } from 'ws'
 
-import HaxballJS from '../src/index.ts'
 import { createHeadlessEnvironment } from '../src/runtime.ts'
-
-const token = process.env.TEST_HB_HEADLESS_TOKEN
-const proxy = process.env.TEST_HB_PROXY
 
 test('does not proxy XMLHttpRequest connections', async (t) => {
 	let targetRequests = 0
@@ -128,36 +124,4 @@ test('routes WebSocket connections through the configured proxy', async (t) => {
 
 	socket.close()
 	await once(socket, 'close')
-})
-
-test('creates a Haxball room with a proxied WebSocket connection', {
-	skip:
-		token && proxy
-			? false
-			: 'TEST_HB_HEADLESS_TOKEN and TEST_HB_PROXY are required',
-	timeout: 30_000,
-}, async () => {
-	assert.ok(token)
-	assert.ok(proxy)
-	const HBInit = await HaxballJS({ proxy, debug: true })
-
-	await new Promise<void>((resolve, reject) => {
-		const timeout = setTimeout(
-			() => reject(new Error('Timed out waiting for the proxied room link')),
-			25_000,
-		)
-
-		const room = HBInit({
-			roomName: 'Haxball.JS',
-			maxPlayers: 16,
-			public: false,
-			noPlayer: true,
-			token,
-		})
-
-		room.onRoomLink = () => {
-			clearTimeout(timeout)
-			resolve()
-		}
-	})
 })

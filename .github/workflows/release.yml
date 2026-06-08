@@ -56,7 +56,6 @@ jobs:
         shell: bash
         env:
           TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
-          TEST_HB_PROXY: ${{ secrets.HEADLESS_TEST_PROXY }}
         run: |
           if [[ -z "$TEST_HB_HEADLESS_TOKEN" ]]; then
             echo "HEADLESS_TEST_TOKEN is not configured" >&2
