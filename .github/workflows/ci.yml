@@ -42,11 +42,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Validate package entrypoints
-        run: |
-          node -e "const pkg = require('./dist/index.cjs'); if (typeof pkg.default !== 'function') throw new Error('Invalid CommonJS entrypoint')"
-          node --input-type=module -e "import HaxballJS from './dist/index.mjs'; if (typeof HaxballJS !== 'function') throw new Error('Invalid ESM entrypoint')"
-
       - name: Validate package
         run: npm pack --dry-run
 

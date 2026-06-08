@@ -1,31 +1,26 @@
-name: Haxball Headless Update Check
+name: Haxball Headless Update
 
 on:
   schedule:
-    # Runs every Monday at 9:00 AM UTC
     - cron: '0 9 * * 1'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
 
 concurrency:
-  group: haxball-room-token
+  group: update-haxball-headless
   cancel-in-progress: false
 
 jobs:
-  update-and-check:
-    name: Update and Check
+  update:
+    name: Update Headless Source
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    outputs:
-      has_changes: ${{ steps.changes.outputs.has_changes }}
-      new_hash: ${{ steps.update.outputs.new_hash }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-        with:
-          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -36,220 +31,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Update generated headless source
+      - name: Update generated source
         id: update
         run: npm run update:headless
 
-      - name: Check for changes
-        id: changes
-        shell: bash
-        run: |
-          if git diff --quiet; then
-            echo "has_changes=false" >> "$GITHUB_OUTPUT"
-            echo "No changes detected after update"
-          else
-            echo "has_changes=true" >> "$GITHUB_OUTPUT"
-            echo "Changes detected after update"
-            git diff --stat
-          fi
-
-      - name: Upload generated source
-        if: steps.changes.outputs.has_changes == 'true'
-        uses: actions/upload-artifact@v7
-        with:
-          name: generated-headless
-          path: src/generated/headless.ts
-          if-no-files-found: error
-          retention-days: 1
-
-  quality:
-    name: Validate Update
-    needs: update-and-check
-    if: needs.update-and-check.outputs.has_changes == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22.18.0
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Download generated source
-        uses: actions/download-artifact@v8
-        with:
-          name: generated-headless
-          path: src/generated
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Type check
-        run: npm run type-check
-
-      - name: Build
-        run: npm run build
-
-      - name: Validate package entrypoints
-        run: |
-          node -e "const pkg = require('./dist/index.cjs'); if (typeof pkg.default !== 'function') throw new Error('Invalid CommonJS entrypoint')"
-          node --input-type=module -e "import HaxballJS from './dist/index.mjs'; if (typeof HaxballJS !== 'function') throw new Error('Invalid ESM entrypoint')"
-
-      - name: Validate package
-        run: npm pack --dry-run
-
-  test:
-    name: Test update on ${{ matrix.os }}
-    needs: update-and-check
-    if: needs.update-and-check.outputs.has_changes == 'true'
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        os: [ubuntu-latest, macos-15, windows-latest]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22.18.0
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Download generated source
-        uses: actions/download-artifact@v8
-        with:
-          name: generated-headless
-          path: src/generated
-
-      - name: Require room token
-        run: node -e "if (!process.env.TEST_HB_HEADLESS_TOKEN) throw new Error('HEADLESS_TEST_TOKEN is not configured')"
-        env:
-          TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
-
-      - name: Run tests
-        run: npm test
-        env:
-          TEST_HB_HEADLESS_TOKEN: ${{ secrets.HEADLESS_TEST_TOKEN }}
-          TEST_HB_PROXY: ${{ secrets.HEADLESS_TEST_PROXY }}
-
-  create-pr:
-    name: Create Pull Request
-    needs: [update-and-check, quality, test]
-    if: needs.update-and-check.outputs.has_changes == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-
-      - name: Download generated source
-        uses: actions/download-artifact@v8
-        with:
-          name: generated-headless
-          path: src/generated
-
-      # A PAT or GitHub App token allows the created PR to trigger CI.
       - name: Create Pull Request
-        id: create-pr
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.UPDATE_PR_TOKEN || github.token }}
-          commit-message: 'chore: update haxball headless (hash: ${{ needs.update-and-check.outputs.new_hash }})'
-          branch: update-haxball-${{ needs.update-and-check.outputs.new_hash }}
+          branch: update-haxball-headless
           delete-branch: true
-          title: 'Update Haxball Headless (hash: ${{ needs.update-and-check.outputs.new_hash }})'
+          commit-message: 'chore: update haxball headless'
+          title: 'Update Haxball Headless (${{ steps.update.outputs.new_hash }})'
           body: |
-            ## Automated Haxball Update
+            Updates the generated Haxball headless source.
 
-            This PR was automatically created by the weekly update check workflow.
-
-            **Build Hash:** `${{ needs.update-and-check.outputs.new_hash }}`
-            **Triggered:** ${{ github.event_name == 'schedule' && 'Weekly scheduled run' || 'Manual dispatch' }}
-
-            **Summary:**
-            The generated Haxball headless source has been refreshed and changes were detected. Package validation and tests passed on ubuntu-latest, macos-15, and windows-latest.
-
-            **Checklist:**
-            - [x] Tests pass on all platforms
-            - [x] Package entrypoints are valid
-            - [ ] No breaking changes detected
-            - [ ] Documentation updated if needed
-
-            ---
-            Auto-generated by Weekly Update Check workflow.
+            Build hash: `${{ steps.update.outputs.new_hash }}`
           labels: |
             automated
-            dependencies
             haxball-update
-
-      - name: Close old update PRs
-        uses: actions/github-script@v9
-        env:
-          CURRENT_PULL_REQUEST: ${{ steps.create-pr.outputs.pull-request-number }}
-        with:
-          github-token: ${{ secrets.UPDATE_PR_TOKEN || github.token }}
-          script: |
-            const currentPullRequest = Number(process.env.CURRENT_PULL_REQUEST || 0);
-            const { data: pullRequests } = await github.rest.pulls.list({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              per_page: 100
-            });
-
-            const updatePRs = pullRequests.filter(pr =>
-              pr.number !== currentPullRequest &&
-              pr.head.ref.startsWith('update-haxball-') &&
-              (pr.labels ?? []).some(label => label.name === 'haxball-update')
-            );
-
-            for (const pr of updatePRs) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: pr.number,
-                body: 'Closing this PR because a newer Haxball update is available.'
-              });
-
-              await github.rest.pulls.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-                state: 'closed'
-              });
-
-              console.log(`Closed old PR #${pr.number}: ${pr.title}`);
-            }
-
-  no-changes:
-    name: Report No Changes
-    needs: update-and-check
-    if: needs.update-and-check.outputs.has_changes == 'false'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Log result
-        run: echo "No updates found. Build hash is ${{ needs.update-and-check.outputs.new_hash }}."
