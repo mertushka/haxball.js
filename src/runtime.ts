@@ -2,15 +2,13 @@ import * as WebRTCNode from '@mertushka/webrtc-node'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 import JSON5 from 'json5'
 import pako from 'pako'
-import WebSocket, { type ClientOptions } from 'ws'
+import WebSocket from 'ws'
 // @ts-expect-error xhr2 does not publish TypeScript declarations.
 import XMLHttpRequest from 'xhr2'
 
 import type { HBInit } from './types.ts'
 
 type Constructor = new (...args: never[]) => object
-
-export type WebRTCConstructor = Constructor
 
 interface HeadlessElement {
 	hidden?: boolean
@@ -27,7 +25,7 @@ interface HeadlessDocument {
 	}
 }
 
-export interface HeadlessWindow {
+interface HeadlessWindow {
 	parent: {
 		HBInit?: typeof HBInit
 		onHBLoaded: () => void
@@ -37,9 +35,9 @@ export interface HeadlessWindow {
 }
 
 export interface WebRTCImplementation {
-	RTCPeerConnection: WebRTCConstructor
-	RTCIceCandidate: WebRTCConstructor
-	RTCSessionDescription: WebRTCConstructor
+	RTCPeerConnection: Constructor
+	RTCIceCandidate: Constructor
+	RTCSessionDescription: Constructor
 }
 
 export interface HaxballJSConfig {
@@ -62,9 +60,9 @@ export interface HeadlessEnvironment {
 	XMLHttpRequest: Constructor
 	JSON5: typeof JSON5
 	pako: typeof pako
-	RTCPeerConnection: WebRTCConstructor
-	RTCIceCandidate: WebRTCConstructor
-	RTCSessionDescription: WebRTCConstructor
+	RTCPeerConnection: Constructor
+	RTCIceCandidate: Constructor
+	RTCSessionDescription: Constructor
 	crypto: Crypto
 	performance: Performance
 	TextEncoder: typeof TextEncoder
@@ -74,7 +72,7 @@ export interface HeadlessEnvironment {
 function isRecaptchaResponse(response: unknown): boolean {
 	if (typeof response === 'string') {
 		try {
-			return isRecaptchaResponse(JSON.parse(response))
+			response = JSON.parse(response)
 		} catch {
 			return false
 		}
@@ -138,8 +136,6 @@ function createWindow(resolve: (value: typeof HBInit) => void): HeadlessWindow {
 		setInterval,
 		clearInterval,
 		console,
-		grecaptcha: undefined,
-		___recaptchaload: undefined,
 	}
 }
 
@@ -152,13 +148,10 @@ export function createHeadlessEnvironment(
 
 	class HaxballWebSocket extends WebSocket {
 		constructor(address: string | URL) {
-			const options: ClientOptions = {
+			super(address, {
+				agent: proxyAgent,
 				headers: { origin: 'https://html5.haxball.com' },
-			}
-
-			if (proxyAgent) options.agent = proxyAgent
-
-			super(address, options)
+			})
 
 			if (config.debug) {
 				this.on('error', (error) => {
@@ -180,7 +173,7 @@ export function createHeadlessEnvironment(
 		}
 	}
 
-	const webrtc: WebRTCImplementation = config.webrtc ?? WebRTCNode
+	const webrtc = config.webrtc ?? WebRTCNode
 
 	return {
 		WebSocket: HaxballWebSocket,

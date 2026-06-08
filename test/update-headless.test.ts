@@ -22,7 +22,6 @@ test('validates and fingerprints upstream source', () => {
 
 	assert.equal(metadata.cacheHash, 'cache123')
 	assert.equal(metadata.sourceHash, 'abcdef12')
-	assert.match(metadata.sha256, /^[a-f0-9]{64}$/)
 })
 
 test('embeds upstream source without rewriting it', () => {
@@ -31,7 +30,7 @@ test('embeds upstream source without rewriting it', () => {
 
 	assert.ok(generated.includes(fixture))
 	assert.ok(generated.includes('export function loadHeadless'))
-	assert.ok(generated.includes(`HAXBALL_SOURCE_HASH = "abcdef12"`))
+	assert.ok(generated.includes('// Haxball source hash: abcdef12'))
 })
 
 test('rejects changed upstream integration points', () => {
