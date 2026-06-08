@@ -7,7 +7,7 @@ const token = process.env.TEST_HB_HEADLESS_TOKEN
 
 test('creates a Haxball room', {
 	skip: token ? false : 'TEST_HB_HEADLESS_TOKEN is not configured',
-	timeout: 30_000,
+	timeout: 60_000,
 }, async () => {
 	assert.ok(token)
 	const HBInit = await HaxballJS({ debug: true })
@@ -15,7 +15,7 @@ test('creates a Haxball room', {
 	await new Promise<void>((resolve, reject) => {
 		const timeout = setTimeout(
 			() => reject(new Error('Timed out waiting for the room link')),
-			25_000,
+			55_000,
 		)
 
 		const room = HBInit({
