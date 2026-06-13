@@ -67,7 +67,7 @@
 		"pre-commit": "npm run lint && npm run type-check"
 	},
 	"dependencies": {
-		"@mertushka/webrtc-node": "^0.1.5",
+		"@mertushka/webrtc-node": "^0.1.6",
 		"https-proxy-agent": "^9.0.0",
 		"json5": "^2.2.3",
 		"pako": "^2.1.0",
