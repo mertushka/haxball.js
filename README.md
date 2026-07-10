@@ -83,7 +83,7 @@ HaxballJS().then((HBInit) => {
 
 #### (Optional) Custom WebRTC Library
 
-Haxball.JS uses `@mertushka/webrtc-node` as the default WebRTC library. However, you can use a custom WebRTC implementation by specifying it in the HaxballJS config using the `webrtc` option.
+Haxball.JS uses `@webrtc-node/webrtc` as the default WebRTC library. However, you can use a custom WebRTC implementation by specifying it in the HaxballJS config using the `webrtc` option.
 
 Example:
 
@@ -119,7 +119,7 @@ HaxballJS({ proxy: "http://1.1.1.1:80", }).then((HBInit) => {...});
 
 <h2 id="technologies">🚀 Technologies</h2>
 
-- @mertushka/webrtc-node - WebRTC implementation for Node.JS
+- @webrtc-node/webrtc - WebRTC implementation for Node.JS
 - ws - Websocket Connection
 - json5 - JSON Helper Module
 - Node.js Web Crypto API - WebCrypto implementation

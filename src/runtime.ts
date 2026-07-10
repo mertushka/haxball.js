@@ -1,4 +1,4 @@
-import * as WebRTCNode from '@mertushka/webrtc-node'
+import * as WebRTCNode from '@webrtc-node/webrtc'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 import JSON5 from 'json5'
 import pako from 'pako'

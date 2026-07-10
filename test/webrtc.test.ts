@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import * as WebRTCNode from '@mertushka/webrtc-node'
+import * as WebRTCNode from '@webrtc-node/webrtc'
 
 import {
 	createHeadlessEnvironment,
@@ -8,7 +8,7 @@ import {
 } from '../src/runtime.ts'
 import type { HBInit } from '../src/types.ts'
 
-test('uses @mertushka/webrtc-node by default', () => {
+test('uses @webrtc-node/webrtc by default', () => {
 	const environment = createHeadlessEnvironment({})
 
 	assert.equal(environment.RTCPeerConnection, WebRTCNode.RTCPeerConnection)
