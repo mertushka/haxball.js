@@ -1,11 +1,11 @@
 import * as WebRTCNode from '@webrtc-node/webrtc'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 import JSON5 from 'json5'
-import pako from 'pako'
 import WebSocket from 'ws'
 // @ts-expect-error xhr2 does not publish TypeScript declarations.
 import XMLHttpRequest from 'xhr2'
 
+import pako from './pako.ts'
 import type { HBInit } from './types.ts'
 
 type Constructor = new (...args: never[]) => object

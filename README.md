@@ -123,7 +123,7 @@ HaxballJS({ proxy: "http://1.1.1.1:80", }).then((HBInit) => {...});
 - ws - Websocket Connection
 - json5 - JSON Helper Module
 - Node.js Web Crypto API - WebCrypto implementation
-- pako - ZLIB port for Node.JS
+- Node.js Zlib API - native compression support
 - xhr2 - W3C XMLHttpRequest implementation for Node.JS
 - https-proxy-agent - Websocket Proxy Support
 
