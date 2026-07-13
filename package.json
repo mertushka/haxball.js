@@ -40,7 +40,6 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.3",
 		"@types/node": "^22.20.1",
-		"@types/pako": "^2.0.4",
 		"@types/ws": "^8.18.1",
 		"simple-git-hooks": "^2.13.1",
 		"tsdown": "^0.22.4",
@@ -70,7 +69,6 @@
 		"@webrtc-node/webrtc": "^0.2.1",
 		"https-proxy-agent": "^9.1.0",
 		"json5": "^2.2.3",
-		"pako": "^2.1.0",
 		"ws": "^8.18.3",
 		"xhr2": "^0.2.1"
 	}
