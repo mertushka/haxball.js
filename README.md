@@ -81,6 +81,27 @@ HaxballJS().then((HBInit) => {
 });
 ```
 
+#### Player Input
+
+Use `player.input` to read the current button state and `room.onPlayerInput` to
+handle input changes. The callback receives the updated player and the previous
+input state. Both states are integer bitmasks; `0` means no buttons are pressed.
+
+```js
+room.onPlayerInput = (player, prevInput) => {
+	const kick = room.InputBits.Kick;
+	const wasKicking = (prevInput & kick) !== 0;
+	const isKicking = (player.input & kick) !== 0;
+	if (isKicking && !wasKicking) {
+		console.log(`${player.name} pressed kick`);
+	}
+};
+```
+
+`room.InputBits` contains `Up: 1`, `Down: 2`, `Left: 4`, `Right: 8`, and `Kick: 16`.
+Multiple buttons combine with bitwise OR, so up and kick together are `17`.
+TypeScript users can import the `InputFlags` and `InputBitsObject` types.
+
 #### (Optional) Custom WebRTC Library
 
 Haxball.JS uses `@webrtc-node/webrtc` as the default WebRTC library. However, you can use a custom WebRTC implementation by specifying it in the HaxballJS config using the `webrtc` option.

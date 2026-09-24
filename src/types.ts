@@ -303,6 +303,9 @@ export interface RoomObject {
 	 */
 	CollisionFlags: CollisionFlagsObject
 
+	/** Named bit values used by PlayerObject.input and onPlayerInput. */
+	InputBits: InputBitsObject
+
 	/**
 	 * Event called when a new player joins the room.
 	 * @param player - The player who joined.
@@ -424,6 +427,13 @@ export interface RoomObject {
 	onPlayerActivity(player: PlayerObject): void
 
 	/**
+	 * Event called when a player changes their input.
+	 * @param player - The player, including the current input state in player.input.
+	 * @param prevInput - The input state before the change.
+	 */
+	onPlayerInput(player: PlayerObject, prevInput: InputFlags): void
+
+	/**
 	 * Event called when the stadium is changed.
 	 * @param newStadiumName - The name of the new stadium.
 	 * @param byPlayer - The player who changed the stadium (can be null if not caused by a player).
@@ -472,6 +482,8 @@ export interface PlayerObject {
 	admin: boolean
 	/** The player's position in the field, or null if the player is not in the field. */
 	position: { x: number; y: number } | null
+	/** The player's current input state, combining the values in room.InputBits. */
+	input: InputFlags
 }
 
 export interface PlayerJoinObject extends PlayerObject {
@@ -513,6 +525,22 @@ export interface ScoresObject {
  * - 2 = Blue Team
  */
 export type TeamID = 0 | 1 | 2
+
+/**
+ * Player input as an integer bitmask. Zero means no buttons are pressed.
+ * Combine room.InputBits values with bitwise OR (|), and test them with AND (&).
+ * For example, Up | Kick is 17.
+ */
+export type InputFlags = number
+
+/** Named input bits exposed by RoomObject.InputBits. */
+export interface InputBitsObject {
+	Up: 1
+	Down: 2
+	Left: 4
+	Right: 8
+	Kick: 16
+}
 
 /**
  * Holds information about a game physics disc.
