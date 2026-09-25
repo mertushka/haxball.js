@@ -14,7 +14,17 @@
  * room.setTimeLimit(0);
  * ```
  */
-export declare function HBInit(roomConfig: RoomConfigObject): RoomObject
+export type HBInit = (roomConfig: RoomConfigObject) => RoomObject
+
+export const InputFlags = {
+	up: 1,
+	down: 2,
+	left: 4,
+	right: 8,
+	kick: 16,
+} as const
+
+export type InputFlagsObject = typeof InputFlags
 
 /**
  * Configuration object for initializing a Haxball room.
@@ -53,7 +63,7 @@ export interface RoomObject {
 	 * @param msg - The message to send.
 	 * @param targetId - If null/undefined, message is sent to all players. Otherwise, sent only to player with matching id.
 	 */
-	sendChat(msg: string, targetId?: number): void
+	sendChat(msg: string, targetId?: number | null): void
 
 	/**
 	 * Changes the admin status of the specified player.
@@ -222,8 +232,8 @@ export interface RoomObject {
 	sendAnnouncement(
 		msg: string,
 		targetId?: number | null,
-		color?: number,
-		style?: string,
+		color?: number | null,
+		style?: string | null,
 		sound?: number,
 	): void
 
@@ -233,7 +243,7 @@ export interface RoomObject {
 	 * @param rate - Works like min but lets players save up extra kicks to use later depending on burst. Default: 0.
 	 * @param burst - How many extra kicks the player can save up. Default: 0.
 	 */
-	setKickRateLimit(min: number, rate: number, burst: number): void
+	setKickRateLimit(min?: number, rate?: number, burst?: number): void
 
 	/**
 	 * Overrides the avatar of the target player.
@@ -253,10 +263,7 @@ export interface RoomObject {
 	 * room.setDiscProperties(0, {x: 0, y: 0});
 	 * ```
 	 */
-	setDiscProperties(
-		discIndex: number,
-		properties: Partial<DiscPropertiesObject>,
-	): void
+	setDiscProperties(discIndex: number, properties: DiscPropertiesUpdate): void
 
 	/**
 	 * Gets the properties of the disc at discIndex.
@@ -272,7 +279,7 @@ export interface RoomObject {
 	 */
 	setPlayerDiscProperties(
 		playerId: number,
-		properties: Partial<DiscPropertiesObject>,
+		properties: DiscPropertiesUpdate,
 	): void
 
 	/**
@@ -302,6 +309,7 @@ export interface RoomObject {
 	 * ```
 	 */
 	CollisionFlags: CollisionFlagsObject
+	InputFlags: InputFlagsObject
 
 	/**
 	 * Event called when a new player joins the room.
@@ -422,6 +430,7 @@ export interface RoomObject {
 	 * @param player - The player who showed activity.
 	 */
 	onPlayerActivity(player: PlayerObject): void
+	onPlayerInput(player: PlayerObject, prevInput: number): void
 
 	/**
 	 * Event called when the stadium is changed.
@@ -472,6 +481,11 @@ export interface PlayerObject {
 	admin: boolean
 	/** The player's position in the field, or null if the player is not in the field. */
 	position: { x: number; y: number } | null
+	input: number
+}
+
+export type DiscPropertiesUpdate = {
+	[K in keyof DiscPropertiesObject]?: DiscPropertiesObject[K] | null
 }
 
 export interface PlayerJoinObject extends PlayerObject {
