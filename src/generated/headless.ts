@@ -7,7 +7,7 @@ import type { HBInit } from '../types.ts'
 
 export function loadHeadless(
 	environment: HeadlessEnvironment,
-): Promise<typeof HBInit> {
+): Promise<HBInit> {
 	return new Promise((resolve, reject) => {
 		const {
 			WebSocket,

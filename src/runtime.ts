@@ -27,7 +27,7 @@ interface HeadlessDocument {
 
 interface HeadlessWindow {
 	parent: {
-		HBInit?: typeof HBInit
+		HBInit?: HBInit
 		onHBLoaded: () => void
 	}
 	document: HeadlessDocument
@@ -66,7 +66,7 @@ export interface HeadlessEnvironment {
 	crypto: Crypto
 	performance: Performance
 	TextEncoder: typeof TextEncoder
-	createWindow(resolve: (value: typeof HBInit) => void): HeadlessWindow
+	createWindow(resolve: (value: HBInit) => void): HeadlessWindow
 }
 
 function isRecaptchaResponse(response: unknown): boolean {
@@ -91,12 +91,12 @@ function isRecaptchaResponse(response: unknown): boolean {
 	)
 }
 
-function createWindow(resolve: (value: typeof HBInit) => void): HeadlessWindow {
+function createWindow(resolve: (value: HBInit) => void): HeadlessWindow {
 	const roomLinkElement = { innerHTML: '' }
 	const recaptchaElement = { hidden: true }
 
 	const parent: HeadlessWindow['parent'] = {
-		set HBInit(value: typeof HBInit) {
+		set HBInit(value: HBInit) {
 			resolve(value)
 		},
 		onHBLoaded: () => {},

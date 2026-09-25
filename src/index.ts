@@ -13,6 +13,6 @@ export { InvalidRoomTokenError }
 
 export default function HaxballJS(
 	config: HaxballJSConfig = {},
-): Promise<typeof HBInit> {
+): Promise<HBInit> {
 	return loadHeadless(createHeadlessEnvironment(config))
 }

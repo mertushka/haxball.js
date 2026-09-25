@@ -44,7 +44,7 @@ test('uses a custom WebRTC implementation', () => {
 
 test('captures HBInit through the window shim', () => {
 	const environment = createHeadlessEnvironment({})
-	const expected = (() => ({})) as unknown as typeof HBInit
+	const expected = (() => ({})) as unknown as HBInit
 	let actual: unknown
 	const window = environment.createWindow((HBInit) => {
 		actual = HBInit
