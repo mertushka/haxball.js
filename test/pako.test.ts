@@ -88,6 +88,21 @@ test('Inflate enforces an upstream-style output buffer limit', () => {
 	)
 })
 
+test('Inflate respects the configured zlib limit with and without an output buffer', () => {
+	class BoundedInflate extends pako.Inflate {
+		readonly buffer = new Uint8Array(source.length)
+	}
+
+	const compressed = pako.deflateRaw(source)
+	for (const Inflate of [pako.Inflate, BoundedInflate]) {
+		const inflate = new Inflate({ maxOutputLength: source.length - 1 })
+		assert.throws(
+			() => inflate.push(compressed, true),
+			/Inflate size exceeds limit/,
+		)
+	}
+})
+
 test('Inflate propagates callback errors', () => {
 	class DataCallbackInflate extends pako.Inflate {
 		override onData() {
@@ -113,12 +128,6 @@ test('Inflate propagates callback errors', () => {
 test('Inflate enforces a zero-length output buffer limit', () => {
 	class BoundedInflate extends pako.Inflate {
 		readonly buffer = new Uint8Array(0)
-
-		override onData(chunk: Uint8Array) {
-			if (chunk.byteLength > this.buffer.byteLength) {
-				throw new Error('Inflate size exceeds limit')
-			}
-		}
 	}
 
 	const inflate = new BoundedInflate({ raw: true })
@@ -126,4 +135,5 @@ test('Inflate enforces a zero-length output buffer limit', () => {
 		() => inflate.push(pako.deflateRaw(Uint8Array.of(1)), true),
 		/Inflate size exceeds limit/,
 	)
+	assert.equal(inflate.push(pako.deflateRaw(Uint8Array.of()), true), true)
 })
