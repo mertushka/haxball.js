@@ -49,8 +49,8 @@ jobs:
           npm run lint
           npm run type-check
           npm run build
-          node -e "const pkg = require('./dist/index.cjs'); if (typeof pkg.default !== 'function') throw new Error('Invalid CommonJS entrypoint')"
-          node --input-type=module -e "import HaxballJS from './dist/index.mjs'; if (typeof HaxballJS !== 'function') throw new Error('Invalid ESM entrypoint')"
+          node -e "const pkg = require('haxball.js'); if (typeof pkg.default !== 'function') throw new Error('Invalid CommonJS entrypoint')"
+          node --input-type=module -e "import HaxballJS from 'haxball.js'; if (typeof HaxballJS !== 'function') throw new Error('Invalid ESM entrypoint')"
 
       - name: Run tests
         shell: bash
@@ -70,12 +70,30 @@ jobs:
         run: |
           VERSION="$(node -p "require('./package.json').version")"
           PACKAGE_FILE="haxball.js-$VERSION.tgz"
-          npm pack
-          if [[ "$(npm view "haxball.js@$VERSION" version 2>/dev/null)" != "$VERSION" ]]; then
+          PUBLISHED="$(npm view haxball.js versions --json --prefer-online | node -e '
+            const versions = JSON.parse(require("node:fs").readFileSync(0, "utf8"))
+            console.log([].concat(versions).includes(process.argv[1]))
+          ' "$VERSION")"
+          if [[ "$PUBLISHED" == false ]]; then
+            npm pack
             npm publish "./$PACKAGE_FILE" --access public --provenance
           fi
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" "./$PACKAGE_FILE" --clobber
+
+          # Use the registry tarball on both the first run and retries.
+          PUBLISHED_DIR="$(mktemp -d "$RUNNER_TEMP/haxball-npm.XXXXXX")"
+          npm pack "haxball.js@$VERSION" --prefer-online --pack-destination "$PUBLISHED_DIR"
+          PUBLISHED_PACKAGE="$PUBLISHED_DIR/$PACKAGE_FILE"
+          if ASSETS="$(gh release view "$GITHUB_REF_NAME" --json assets --jq '.assets[].name')"; then
+            if grep -Fxq "$PACKAGE_FILE" <<< "$ASSETS"; then
+              EXISTING_DIR="$(mktemp -d "$RUNNER_TEMP/haxball-release.XXXXXX")"
+              gh release download "$GITHUB_REF_NAME" --pattern "$PACKAGE_FILE" --dir "$EXISTING_DIR"
+              if ! cmp -s "$PUBLISHED_PACKAGE" "$EXISTING_DIR/$PACKAGE_FILE"; then
+                echo "GitHub release asset differs from the published npm tarball" >&2
+                exit 1
+              fi
+            else
+              gh release upload "$GITHUB_REF_NAME" "$PUBLISHED_PACKAGE"
+            fi
           else
-            gh release create "$GITHUB_REF_NAME" "./$PACKAGE_FILE" --generate-notes --verify-tag
+            gh release create "$GITHUB_REF_NAME" "$PUBLISHED_PACKAGE" --generate-notes --verify-tag
           fi

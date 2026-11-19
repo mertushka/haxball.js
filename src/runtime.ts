@@ -1,4 +1,4 @@
-import * as WebRTCNode from '@webrtc-node/webrtc'
+import { createRequire } from 'node:module'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 import JSON5 from 'json5'
 import WebSocket from 'ws'
@@ -7,6 +7,8 @@ import XMLHttpRequest from 'xhr2'
 
 import pako from './pako.ts'
 import type { HBInit } from './types.ts'
+
+const require = createRequire(import.meta.url)
 
 type Constructor = new (...args: never[]) => object
 
@@ -162,6 +164,8 @@ export function createHeadlessEnvironment(
 	}
 
 	class HaxballXMLHttpRequest extends XMLHttpRequest {
+		timeout = 15_000
+
 		dispatchEvent(event: { type: string }) {
 			const { response } = this as unknown as { response: unknown }
 
@@ -169,11 +173,18 @@ export function createHeadlessEnvironment(
 				throw new InvalidRoomTokenError()
 			}
 
-			return super.dispatchEvent(event)
+			const result = super.dispatchEvent(event)
+			// The generated host listens for error and load, so it needs an
+			// error notification when xhr2 times out during a network stall.
+			if (event.type === 'timeout') {
+				super.dispatchEvent({ ...event, type: 'error' })
+			}
+			return result
 		}
 	}
 
-	const webrtc = config.webrtc ?? WebRTCNode
+	const webrtc =
+		config.webrtc ?? (require('@webrtc-node/webrtc') as WebRTCImplementation)
 
 	return {
 		WebSocket: HaxballWebSocket,

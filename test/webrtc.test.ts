@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
 import test from 'node:test'
 import * as WebRTCNode from '@webrtc-node/webrtc'
 
@@ -40,6 +41,29 @@ test('uses a custom WebRTC implementation', () => {
 	assert.equal(environment.RTCPeerConnection, RTCPeerConnection)
 	assert.equal(environment.RTCIceCandidate, RTCIceCandidate)
 	assert.equal(environment.RTCSessionDescription, RTCSessionDescription)
+})
+
+test('uses a custom WebRTC implementation when the default cannot load', () => {
+	const runtime = new URL('../src/runtime.ts', import.meta.url)
+	execFileSync(process.execPath, [
+		'--input-type=module',
+		'--eval',
+		`
+		import assert from 'node:assert/strict'
+		import { registerHooks } from 'node:module'
+		registerHooks({
+			resolve(specifier, context, nextResolve) {
+				if (specifier === '@webrtc-node/webrtc') throw new Error('Default backend unavailable')
+				return nextResolve(specifier, context)
+			},
+		})
+		const { createHeadlessEnvironment } = await import(${JSON.stringify(runtime.href)})
+		class Custom {}
+		const webrtc = { RTCPeerConnection: Custom, RTCIceCandidate: Custom, RTCSessionDescription: Custom }
+		assert.equal(createHeadlessEnvironment({ webrtc }).RTCPeerConnection, Custom)
+		assert.throws(() => createHeadlessEnvironment({}), /Default backend unavailable/)
+		`,
+	])
 })
 
 test('captures HBInit through the window shim', () => {
