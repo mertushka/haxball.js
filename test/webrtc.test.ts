@@ -11,14 +11,14 @@ import type { HBInit } from '../src/types.ts'
 test('uses @webrtc-node/webrtc by default', () => {
 	const environment = createHeadlessEnvironment({})
 
+	assert.equal(environment.RTCPeerConnection, WebRTCNode.RTCPeerConnection)
 	assert.equal(environment.RTCIceCandidate, WebRTCNode.RTCIceCandidate)
 	assert.equal(
 		environment.RTCSessionDescription,
 		WebRTCNode.RTCSessionDescription,
 	)
 
-	const peerConnection = new environment.RTCPeerConnection()
-	assert.ok(peerConnection instanceof WebRTCNode.RTCPeerConnection)
+	const peerConnection = new environment.RTCPeerConnection({ iceServers: [] })
 	peerConnection.close()
 })
 

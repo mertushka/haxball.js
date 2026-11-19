@@ -10,75 +10,6 @@ import type { HBInit } from './types.ts'
 
 type Constructor = new (...args: never[]) => object
 
-class HaxballPeerConnection extends WebRTCNode.RTCPeerConnection {
-	#sendFailed = false
-	#closing = false
-	#reliableChannels: WebRTCNode.RTCDataChannel[] = []
-
-	override createDataChannel(
-		label: string,
-		options?: WebRTCNode.RTCDataChannelInit,
-	): WebRTCNode.RTCDataChannel {
-		const channel = super.createDataChannel(label, options)
-		const reliable =
-			channel.maxRetransmits === null && channel.maxPacketLifeTime === null
-		const send = channel.send
-
-		channel.send = (data) => {
-			if (this.#sendFailed || this.#closing) return
-			try {
-				send.call(channel, data)
-			} catch (error) {
-				if (!(error instanceof Error) || error.name !== 'OperationError') {
-					throw error
-				}
-				if (reliable) this.#failSend()
-			}
-		}
-		if (reliable) {
-			this.#reliableChannels.push(channel)
-			channel.addEventListener('error', () => this.#failSend(), { once: true })
-		}
-
-		return channel
-	}
-
-	override close(): void {
-		if (this.#closing) return
-		this.#closing = true
-		// Headless sends the kick reason and closes the peer in the same turn.
-		// Peer close cancels pending sends, so allow healthy channels to drain.
-		const deadline = performance.now() + 1000
-		const finish = () => {
-			const connected = this.connectionState === 'connected'
-			const pending = this.#reliableChannels.some(
-				(channel) =>
-					channel.readyState === 'open' && channel.bufferedAmount > 0,
-			)
-			if (
-				!this.#sendFailed &&
-				connected &&
-				pending &&
-				performance.now() < deadline
-			) {
-				setTimeout(finish, 10)
-				return
-			}
-			this.#reliableChannels = []
-			super.close()
-		}
-		finish()
-	}
-
-	#failSend(): void {
-		if (this.#sendFailed) return
-		this.#sendFailed = true
-		// Headless broadcasts iterate a live player list. Closing the peer
-		// synchronously would remove it and skip the next recipient.
-		queueMicrotask(() => this.close())
-	}
-}
-
 interface HeadlessElement {
 	hidden?: boolean
 	innerHTML?: string
@@ -107,12 +38,6 @@ export interface WebRTCImplementation {
 	RTCPeerConnection: Constructor
 	RTCIceCandidate: Constructor
 	RTCSessionDescription: Constructor
-}
-
-const defaultWebRTC: WebRTCImplementation = {
-	RTCPeerConnection: HaxballPeerConnection,
-	RTCIceCandidate: WebRTCNode.RTCIceCandidate,
-	RTCSessionDescription: WebRTCNode.RTCSessionDescription,
 }
 
 export interface HaxballJSConfig {
@@ -248,7 +173,7 @@ export function createHeadlessEnvironment(
 		}
 	}
 
-	const webrtc = config.webrtc ?? defaultWebRTC
+	const webrtc = config.webrtc ?? WebRTCNode
 
 	return {
 		WebSocket: HaxballWebSocket,
