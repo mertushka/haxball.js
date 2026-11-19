@@ -1,4 +1,10 @@
-import { appendFile, mkdir, rename, writeFile } from 'node:fs/promises'
+import {
+	appendFile,
+	mkdir,
+	readFile,
+	rename,
+	writeFile,
+} from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 
 const CACHE_HASH_URL = 'https://www.haxball.com/cache_hash.json'
@@ -13,13 +19,20 @@ function countMatches(source: string, pattern: RegExp): number {
 	return [...source.matchAll(pattern)].length
 }
 
+function validateCacheHash(cacheHash: unknown): asserts cacheHash is string {
+	if (typeof cacheHash !== 'string') {
+		throw new Error('Haxball cache hash response is not a string')
+	}
+	if (!/^[A-Za-z0-9_-]+$/.test(cacheHash)) {
+		throw new Error(`Unexpected Haxball cache hash: ${cacheHash}`)
+	}
+}
+
 export function inspectHeadlessSource(
 	cacheHash: string,
 	source: string,
 ): HeadlessSourceMetadata {
-	if (!/^[A-Za-z0-9_-]+$/.test(cacheHash)) {
-		throw new Error(`Unexpected Haxball cache hash: ${cacheHash}`)
-	}
+	validateCacheHash(cacheHash)
 
 	const sourceHash = source.match(/\/\*[\s\S]*?\b([a-f0-9]{8})\b/)?.[1]
 	if (!sourceHash) {
@@ -91,8 +104,18 @@ export function loadHeadless(
 	return `${header}${source.trim()}${footer}`
 }
 
-export async function updateHeadless(): Promise<HeadlessSourceMetadata> {
-	const cacheResponse = await fetch(CACHE_HASH_URL)
+function comparableContents(module: string): string {
+	return module
+		.replaceAll('\r\n', '\n')
+		.replace(/^\/\/ Haxball cache hash: .*\n/m, '')
+}
+
+export async function updateHeadless(
+	outputPath: string = OUTPUT_PATH,
+): Promise<HeadlessSourceMetadata> {
+	const cacheResponse = await fetch(CACHE_HASH_URL, {
+		signal: AbortSignal.timeout(30_000),
+	})
 	if (!cacheResponse.ok) {
 		throw new Error(
 			`Failed to fetch cache hash: ${cacheResponse.status} ${cacheResponse.statusText}`,
@@ -100,12 +123,12 @@ export async function updateHeadless(): Promise<HeadlessSourceMetadata> {
 	}
 
 	const cacheHash: unknown = await cacheResponse.json()
-	if (typeof cacheHash !== 'string') {
-		throw new Error('Haxball cache hash response is not a string')
-	}
+	validateCacheHash(cacheHash)
 
 	const sourceUrl = `https://www.haxball.com/${cacheHash}/__cache_static__/g/headless-min.js`
-	const sourceResponse = await fetch(sourceUrl)
+	const sourceResponse = await fetch(sourceUrl, {
+		signal: AbortSignal.timeout(30_000),
+	})
 	if (!sourceResponse.ok) {
 		throw new Error(
 			`Failed to fetch headless source: ${sourceResponse.status} ${sourceResponse.statusText}`,
@@ -117,12 +140,24 @@ export async function updateHeadless(): Promise<HeadlessSourceMetadata> {
 
 	const metadata = inspectHeadlessSource(cacheHash, source)
 	const output = createGeneratedModule(metadata, source)
-	const temporaryPath = `${OUTPUT_PATH}.tmp`
+	const current = await readFile(outputPath, 'utf8').catch(
+		(error: NodeJS.ErrnoException) => {
+			if (error.code !== 'ENOENT') throw error
+			return ''
+		},
+	)
+	if (comparableContents(current) !== comparableContents(output)) {
+		const temporaryPath = `${outputPath}.tmp`
+		await mkdir(dirname(outputPath), { recursive: true })
+		await writeFile(temporaryPath, output, 'utf8')
+		await rename(temporaryPath, outputPath)
+	}
 
-	await mkdir(dirname(OUTPUT_PATH), { recursive: true })
-	await writeFile(temporaryPath, output, 'utf8')
-	await rename(temporaryPath, OUTPUT_PATH)
+	return metadata
+}
 
+if (import.meta.main) {
+	const metadata = await updateHeadless()
 	if (process.env.GITHUB_OUTPUT) {
 		await appendFile(
 			process.env.GITHUB_OUTPUT,
@@ -132,7 +167,4 @@ export async function updateHeadless(): Promise<HeadlessSourceMetadata> {
 	}
 
 	console.log(`SUCCESS:${metadata.sourceHash}`)
-	return metadata
 }
-
-if (import.meta.main) await updateHeadless()

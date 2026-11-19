@@ -50,15 +50,18 @@ export class Inflate {
 		}
 
 		const outputBuffer = (this as { buffer?: unknown }).buffer
+		const bufferLimit =
+			outputBuffer instanceof Uint8Array ? outputBuffer.byteLength : undefined
+		const optionLimit = this.#options.maxOutputLength
 		const maxOutputLength =
-			outputBuffer instanceof Uint8Array
-				? Math.max(1, outputBuffer.byteLength)
-				: undefined
+			bufferLimit === undefined
+				? optionLimit
+				: Math.min(optionLimit ?? Infinity, Math.max(1, bufferLimit))
 		const chunkSize =
-			maxOutputLength === undefined
+			bufferLimit === undefined
 				? this.#options.chunkSize
 				: (this.#options.chunkSize ??
-					Math.max(constants.Z_MIN_CHUNK, maxOutputLength))
+					Math.max(constants.Z_MIN_CHUNK, bufferLimit))
 
 		let output: Uint8Array
 		try {
@@ -90,6 +93,9 @@ export class Inflate {
 			return false
 		}
 
+		if (bufferLimit === 0 && output.byteLength !== 0) {
+			throw new Error('Inflate size exceeds limit')
+		}
 		this.onData(output)
 		this.onEnd(0)
 		return true

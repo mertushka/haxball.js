@@ -125,3 +125,34 @@ test('routes WebSocket connections through the configured proxy', async (t) => {
 	socket.close()
 	await once(socket, 'close')
 })
+
+test('reports a stalled XMLHttpRequest to the headless error handler', {
+	timeout: 5000,
+}, async (t) => {
+	const server = createServer()
+	server.listen(0, '127.0.0.1')
+	await once(server, 'listening')
+	t.after(() => {
+		server.close()
+		server.closeAllConnections()
+	})
+
+	const address = server.address()
+	assert.ok(address && typeof address !== 'string')
+	const { XMLHttpRequest } = createHeadlessEnvironment({})
+	const request = new XMLHttpRequest() as {
+		timeout: number
+		onerror: (event: { type: string }) => void
+		open(method: string, url: string): void
+		send(): void
+	}
+	assert.ok(request.timeout > 0)
+	request.timeout = 50
+
+	const error = await new Promise<{ type: string }>((resolve) => {
+		request.onerror = resolve
+		request.open('GET', `http://127.0.0.1:${address.port}`)
+		request.send()
+	})
+	assert.equal(error.type, 'error')
+})
