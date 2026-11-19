@@ -1,6 +1,6 @@
 {
 	"name": "haxball.js",
-	"version": "5.1.0",
+	"version": "5.1.1",
 	"author": "mertushka",
 	"description": "A powerful library for interacting with the Haxball Headless API",
 	"keywords": [
@@ -66,7 +66,7 @@
 		"pre-commit": "npm run lint && npm run type-check"
 	},
 	"dependencies": {
-		"@webrtc-node/webrtc": "^0.2.1",
+		"@webrtc-node/webrtc": "^0.2.3",
 		"https-proxy-agent": "^9.1.0",
 		"json5": "^2.2.3",
 		"ws": "^8.18.3",
