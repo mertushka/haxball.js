@@ -79,9 +79,22 @@ jobs:
             npm publish "./$PACKAGE_FILE" --access public --provenance
           fi
 
-          # Use the registry tarball on both the first run and retries.
+          # npm can accept a publish before the exact version is available for download.
           PUBLISHED_DIR="$(mktemp -d "$RUNNER_TEMP/haxball-npm.XXXXXX")"
-          npm pack "haxball.js@$VERSION" --prefer-online --pack-destination "$PUBLISHED_DIR"
+          PACK_LOG="$PUBLISHED_DIR/npm-pack.log"
+          for attempt in {1..13}; do
+            # npm pack checks the tarball against the registry's published integrity.
+            if npm pack "haxball.js@$VERSION" --prefer-online --color=false --pack-destination "$PUBLISHED_DIR" >"$PACK_LOG" 2>&1; then
+              cat "$PACK_LOG"
+              break
+            fi
+            if (( attempt == 13 )) || ! grep -Eq '^npm (error|ERR!) code (ETARGET|E404)[[:space:]]*$' "$PACK_LOG"; then
+              cat "$PACK_LOG" >&2
+              exit 1
+            fi
+            echo "Waiting for haxball.js@$VERSION to become available on npm (attempt $attempt of 13)"
+            sleep 30
+          done
           PUBLISHED_PACKAGE="$PUBLISHED_DIR/$PACKAGE_FILE"
           if ASSETS="$(gh release view "$GITHUB_REF_NAME" --json assets --jq '.assets[].name')"; then
             if grep -Fxq "$PACKAGE_FILE" <<< "$ASSETS"; then
